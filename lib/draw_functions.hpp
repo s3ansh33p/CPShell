@@ -27,7 +27,7 @@ free(menuFont);
 #include <sdk/os/mem.hpp>
 #include <sdk/os/string.hpp>
 #include "shaders.hpp"
-#include "calc.hpp"
+#include "../calc.hpp"
 
 #define LOAD_TEXTURE_PTR(path, pointer) uint16_t *pointer = load_texture(path)
 #define LOAD_FONT_PTR(path, pointer) uint8_t *pointer = load_font(path)
