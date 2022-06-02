@@ -112,23 +112,29 @@ void kbEnter() {
 		if (keyboard->xcursor == 2) {
 			// enter
 			// store buffer
-			char buf[64];
+			char buf[BUF_SIZE];
 			for (int i = 0; i < terminal->bufferInPos; i++) {
 				buf[i] = terminal->bufferIn[i];
 			}
+			terminal->HideCursor();
 			terminal->bufferCY++;
 
 			// read current buffer
 			// check for command "help"
 			// check for command "clear"
 			// else print error
+
+			// Todo: create a command handler class
 			
+			bool validCommandFound = false;
+
 			if (terminal->bufferInPos == 4) {
 				if ((buf[0] == 'h' || buf[0] == 'H') && (buf[1] == 'e' || buf[1] == 'E') && (buf[2] == 'l' || buf[2] == 'L') && (buf[3] == 'p' || buf[3] == 'P')) {
 					// clear buffer
 					terminal->ClearBuffer();
-					char help[] = "help: prints this help message\nclear: clears the terminal\n\n";
+					char help[] = "help: prints this help message\nclear: clears the terminal\n";
 					terminal->WriteChars(help);
+					validCommandFound = true;
 				}
 			} else if (terminal->bufferInPos == 5) {
 				if ((buf[0] == 'c' || buf[0] == 'C') && (buf[1] == 'l' || buf[1] == 'L') && (buf[2] == 'e' || buf[2] == 'E') && (buf[3] == 'a' || buf[3] == 'A') && (buf[4] == 'r' || buf[4] == 'R')) {
@@ -138,12 +144,13 @@ void kbEnter() {
 					keyboard->Render();
 					// keyboard highlight
 					keyboard->Highlight(keyboard->xcursor, keyboard->ycursor);
-					// clear buffer
-					terminal->ClearBuffer();
+					// clear buffer done later for us
 					// reset terminal y
 					terminal->bufferCY = 0;
+					validCommandFound = true;
 				}
-			} else {
+			}
+			if (!validCommandFound) {
 				// clear buffer
 				terminal->ClearBuffer();
 				char error[27] = "error: command not found\n";
@@ -170,7 +177,7 @@ void main2() {
 	// load the textures and fonts
 	LOAD_FONT_PTR("fnt\\7x8", f_7x8);
 	
-	fillScreen(color(0, 0, 0));
+	fillScreen(0); // clear the screen to black (0,0,0)
 
 	RandomGenerator rngp;
 	rng = &rngp;
@@ -185,8 +192,8 @@ void main2() {
 	Terminal terminalp;
 	terminal = &terminalp;
 	terminal->SetFont(f_7x8);
-	Debug_Printf(20,29,true,0,"Max X: %i", terminal->xmax);
-	Debug_Printf(20,30,true,0,"W x H: %i x %i", terminal->termWidth, terminal->termHeight);
+	Debug_Printf(10,29,true,0,"Max X: %i", terminal->xmax);
+	Debug_Printf(10,30,true,0,"W x H: %i x %i", terminal->termWidth, terminal->termHeight);
 
 
 	// Add event listeners
@@ -201,7 +208,7 @@ void main2() {
 	addListener2(KEY_DOWN, kbDown); // down cursor
 	addListener(KEY_EXE, kbEnter); // send the key
 
-	char welcomeMessage[] = "Welcome to CPShell!\nType 'help' for a list of commands.\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nA\nBC\nDE\n\n\n";
+	char welcomeMessage[] = "Welcome to CPShell!\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nType 'help' for a list of commands.\n\n\n";
 	terminal->WriteChars(welcomeMessage);
 
 	LCD_Refresh();
@@ -220,16 +227,16 @@ void main2() {
 			frameCounter = 0;
 			isCursorShowing = !isCursorShowing;
 			if (isCursorShowing) {
-				Debug_Printf(20,32,true,0,"Cursor: %i, %i On", keyboard->xcursor, keyboard->ycursor);
+				terminal->ShowCursor();
 			} else {
-				Debug_Printf(20,32,true,0,"Cursor: %i, %i Off", keyboard->xcursor, keyboard->ycursor);
+				terminal->HideCursor();
 			}
 		}
 
 		checkEvents();
 		
-		Debug_Printf(20,31,true,0,"RNG: %i",rng->m_x);
-		Debug_Printf(20,26,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
+		Debug_Printf(10,31,true,0,"RNG: %i",rng->m_x);
+		Debug_Printf(10,28,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
 
 		LCD_Refresh();
 	}

@@ -7,9 +7,11 @@
 class Terminal {
 	public: 
 		void ClearBuffer();
-		void WriteBuffer(char c);
+		void WriteBuffer(char c, bool hideCursor = true);
 		void WriteChars(char* charArray);
 		void RemoveLast();
+		void ShowCursor();
+		void HideCursor();
 		void SetFont(uint8_t* font);
 		// buffer for command input
 		char bufferIn[BUF_SIZE];
@@ -19,8 +21,8 @@ class Terminal {
 		int16_t bufferCY = 0;
 		int16_t bufferOffsetX = 8;
 		int16_t bufferOffsetY = 8;
-		int16_t xmargin = 10;
-		int16_t ymargin = 10;
+		int16_t xmargin = 8; // character width
+		int16_t ymargin = 9; // character height
 		uint8_t* font;
 		int16_t termWidth = width - xmargin * 2;
 		int16_t termHeight = 40;
@@ -36,12 +38,13 @@ void Terminal::ClearBuffer() {
 	this->bufferCX = 0;
 }
 
-void Terminal::WriteBuffer(char c) {
+void Terminal::WriteBuffer(char c, bool hideCursor) {
+	// hideCursor should only be false from WriteChars as writing to vram is slow
+	if (hideCursor) this->HideCursor();
 	// check if '\n'
 	if (c == '\n') {
-		this->bufferCY++;
-		this->bufferCX = 0;
 		this->ClearBuffer();
+		this->bufferCY++;
 		return;
 	}
 
@@ -77,7 +80,7 @@ void Terminal::WriteBuffer(char c) {
 void Terminal::WriteChars(char *charArray) {
 	int len = strlen(charArray);
 	for (int i = 0; i < len; i++) {
-		this->WriteBuffer(charArray[i]);
+		this->WriteBuffer(charArray[i], false);
 	}
 	// clear the buffer
 	this->ClearBuffer();
@@ -85,6 +88,8 @@ void Terminal::WriteChars(char *charArray) {
 
 void Terminal::RemoveLast() {
 	if (this->bufferInPos == 0) return;
+	// remove the active cursor
+	this->HideCursor();
 	// check for wrapping
 	if (this->bufferCX == 0) {
 		this->bufferCY--;
@@ -95,5 +100,17 @@ void Terminal::RemoveLast() {
 
 	this->bufferInPos--;
 	// remove the last character from vram
+	drawFilledRectangle(this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->xmargin, this->ymargin, 0); // 0 is always color black / 0,0,0
+}
+
+// Cursor Show
+void Terminal::ShowCursor() {
+	// draw the cursor
+	drawFilledRectangle(this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->xmargin, this->ymargin, color(255,255,255));
+}
+
+// Cursor Hide
+void Terminal::HideCursor() {
+	// draw the cursor
 	drawFilledRectangle(this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->xmargin, this->ymargin, 0); // 0 is always color black / 0,0,0
 }
