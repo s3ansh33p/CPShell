@@ -125,32 +125,36 @@ void kbEnter() {
 			
 			if (terminal->bufferInPos == 4) {
 				if ((buf[0] == 'h' || buf[0] == 'H') && (buf[1] == 'e' || buf[1] == 'E') && (buf[2] == 'l' || buf[2] == 'L') && (buf[3] == 'p' || buf[3] == 'P')) {
-					char help[31] = "help: prints this help message";
-					terminal->bufferInPos = 30;
-					for (int i = 0; i < 31; i++) {
-						terminal->bufferIn[i] = help[i];
-					}
-					terminal->OutputBuffer();
+					// clear buffer
+					terminal->ClearBuffer();
+					char help[] = "help: prints this help message\nclear: clears the terminal\n\n";
+					terminal->WriteChars(help);
 				}
 			} else if (terminal->bufferInPos == 5) {
 				if ((buf[0] == 'c' || buf[0] == 'C') && (buf[1] == 'l' || buf[1] == 'L') && (buf[2] == 'e' || buf[2] == 'E') && (buf[3] == 'a' || buf[3] == 'A') && (buf[4] == 'r' || buf[4] == 'R')) {
-					// TBA
+					// clear the screen to black
+					fillScreen(0);
+					// rerender the keyboard
+					keyboard->Render();
+					// keyboard highlight
+					keyboard->Highlight(keyboard->xcursor, keyboard->ycursor);
+					// clear buffer
+					terminal->ClearBuffer();
+					// reset terminal y
+					terminal->bufferCY = 0;
 				}
 			} else {
+				// clear buffer
+				terminal->ClearBuffer();
 				char error[27] = "error: command not found\n";
-				terminal->bufferInPos = 26;
-				for (int i = 0; i < 26; i++) {
-					terminal->bufferIn[i] = error[i];
-				}
-				terminal->OutputBuffer();
+				terminal->WriteChars(error);
 			}
 
 			terminal->ClearBuffer();
 
 		} else if (keyboard->xcursor == 1) {
 			// back
-			// hex for space is 20
-			terminal->WriteBuffer(0x20, true);
+			terminal->RemoveLast();
 		} else {
 			// space
 			terminal->WriteBuffer(0x20);
@@ -159,26 +163,6 @@ void kbEnter() {
 		terminal->WriteBuffer(activeKey);
 	}
 }
-
-
-// Write to the buffer a motd message
-void writeMotd() {
-	char motd[] = "Welcome to CPShell!\nType 'help' for a list of commands.\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nSomething something something\nEXTRALONGMESSAGEWITHOUTHANYTHINGINBETWEENWORDS\n\n\n";
-	// get length
-	int len = strlen(motd);
-	// write the motd
-	for (int j = 0; j < len; j++) {
-		terminal->WriteBuffer(motd[j]);
-		// check for newline
-		if (motd[j] == '\n') {
-			// clear the buffer
-			terminal->ClearBuffer();
-		}
-	}
-	// clear the buffer
-	terminal->ClearBuffer();
-}
-
 
 //The acutal main
 void main2() {
@@ -217,17 +201,35 @@ void main2() {
 	addListener2(KEY_DOWN, kbDown); // down cursor
 	addListener(KEY_EXE, kbEnter); // send the key
 
+	char welcomeMessage[] = "Welcome to CPShell!\nType 'help' for a list of commands.\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nA\nBC\nDE\n\n\n";
+	terminal->WriteChars(welcomeMessage);
 
 	LCD_Refresh();
 
-	writeMotd();
+	// frame counter for updating the blinky cursor
+	uint8_t frameCounter = 0;
+	bool isCursorShowing = false;
 
 	while (shell_running) {
+
+		// frame counter
+		frameCounter++;
+
+		// update the cursor
+		if (frameCounter > 10) {
+			frameCounter = 0;
+			isCursorShowing = !isCursorShowing;
+			if (isCursorShowing) {
+				Debug_Printf(20,32,true,0,"Cursor: %i, %i On", keyboard->xcursor, keyboard->ycursor);
+			} else {
+				Debug_Printf(20,32,true,0,"Cursor: %i, %i Off", keyboard->xcursor, keyboard->ycursor);
+			}
+		}
+
 		checkEvents();
 		
-
-		
 		Debug_Printf(20,31,true,0,"RNG: %i",rng->m_x);
+		Debug_Printf(20,26,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
 
 		LCD_Refresh();
 	}
