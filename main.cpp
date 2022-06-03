@@ -8,8 +8,13 @@
 #include "lib/functions/random.hpp"
 
 // shell
-#include "src/cpshell.cpp"
+#include "src/internal.hpp" // definitions
 #include "src/terminal.hpp"
+
+// Terminal pointer
+Terminal* terminal;
+
+#include "src/cpshell.cpp"
 #include "src/virtual_keyboard.hpp"
 
 #ifndef PC
@@ -28,9 +33,6 @@ RandomGenerator* rng;
 
 // Virtual Keyboard pointer
 VirtualKeyboard* keyboard;
-
-// Terminal pointer
-Terminal* terminal;
 
 // Ends the Shell and is called by the event handler
 void endShell() {
@@ -104,6 +106,11 @@ void kbDown() {
 		keyboard->Highlight(keyboard->xcursor, keyboard->ycursor);
 	}
 }
+
+void kbBackspace() {
+	terminal->RemoveLast();
+}
+
 void kbEnter() {
 	// write to the char buffer
 	char activeKey = keyboard->activeKey[0];
@@ -128,12 +135,77 @@ void kbEnter() {
 			
 			bool validCommandFound = false;
 
-			if (terminal->bufferInPos == 4) {
+			if (terminal->bufferInPos == 1) {
+				// tmp testing command
+				if (terminal->bufferIn[0] == 'a') {
+					// test data for now
+					char callingProg[] = "/fls0/cpshell/cpshell.exe";
+					char newProgName[] = "test.exe";
+					char callingArgs[] = "Hewlkdlfgj kdflglk Jljjkhj shfjhjj hj";
+					int argc = 2;
+					// count number spaces in callingArgs
+					for (int i = 0; i < strlen(callingArgs); i++) {
+						if (callingArgs[i] == ' ') {
+							argc++;
+						}
+					}
+					// check if final space is in callingArgs
+					if (callingArgs[strlen(callingArgs) - 1] != ' ') {
+						argc++;
+					}
+					// create instance of argv
+					char** argv = new char*[argc];
+					// set index 0 to callingProg
+					argv[0] = callingProg;
+					// set index 1 to newProgName
+					argv[1] = newProgName;
+					// split callingArgs into argv
+					int argvIndex = 2;
+					
+					char currentArg[ARGV_SIZE];
+					int currentArgIndex = 0;
+					for (int i = 0; i < strlen(callingArgs); i++) {
+						if (callingArgs[i] == ' ') {
+							argv[argvIndex] = new char[currentArgIndex + 1];
+							for (int j = 0; j < currentArgIndex; j++) {
+								argv[argvIndex][j] = currentArg[j];
+							}
+							argv[argvIndex][currentArgIndex] = '\0';
+							argvIndex++;
+							currentArgIndex = 0;
+						} else {
+							currentArg[currentArgIndex] = callingArgs[i];
+							currentArgIndex++;
+						}
+					}
+					// set last argv to last arg
+					argv[argvIndex] = new char[currentArgIndex + 1];
+					for (int j = 0; j < currentArgIndex; j++) {
+						argv[argvIndex][j] = currentArg[j];
+					}
+					argv[argvIndex][currentArgIndex] = '\0';
+
+					// call cpshell_main
+					cpshell_main(argc, argv);
+
+					// call cpshell_main
+					// set var test to be char ** and have "test"
+					// char** test = new char*[2];
+					// test[0] = "test";
+					// cpshell_main(1, test);
+					validCommandFound = true;
+				}
+			} else if (terminal->bufferInPos == 4) {
 				if ((buf[0] == 'h' || buf[0] == 'H') && (buf[1] == 'e' || buf[1] == 'E') && (buf[2] == 'l' || buf[2] == 'L') && (buf[3] == 'p' || buf[3] == 'P')) {
 					// clear buffer
 					terminal->ClearBuffer();
-					char help[] = "help: prints this help message\nclear: clears the terminal\n";
+					char help[] = "help: prints this help message\nclear: clears the terminal\nexit: exits the shell\n";
 					terminal->WriteChars(help);
+					validCommandFound = true;
+					// exit
+				} else if ((buf[0] == 'e' || buf[0] == 'E') && (buf[1] == 'x' || buf[1] == 'X') && (buf[2] == 'i' || buf[2] == 'I') && (buf[3] == 't' || buf[3] == 'T')) {
+					// exit
+					endShell();
 					validCommandFound = true;
 				}
 			} else if (terminal->bufferInPos == 5) {
@@ -161,7 +233,7 @@ void kbEnter() {
 
 		} else if (keyboard->xcursor == 1) {
 			// back
-			terminal->RemoveLast();
+			kbBackspace();
 		} else {
 			// space
 			terminal->WriteBuffer(0x20);
@@ -197,8 +269,8 @@ void main2() {
 
 
 	// Add event listeners
-	addListener(KEY_CLEAR, endShell); // end the shell
-	addListener(KEY_BACKSPACE, updateRNG); // update the random number
+	addListener(KEY_CLEAR, endShell); // end the shell - cmd now
+	addListener(KEY_BACKSPACE, kbBackspace); // remove last character
 	addListener(KEY_SHIFT, kbShift); // toggle Shift 
 
 	// Keyboard Listeners

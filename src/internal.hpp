@@ -14,6 +14,7 @@
 #define PATH_LEN        256
 #define BUF_SIZE        512
 #define EXPAND_ALLOC    256
+#define ARGV_SIZE       64
 
 #define isBlank(ch)     (((ch) == ' ') || ((ch) == '\t'))
 #define isDecimal(ch)   (((ch) >= '0') && ((ch) <= '9'))
