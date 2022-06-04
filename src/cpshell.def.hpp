@@ -4,4 +4,6 @@
  */
 
 #define CPS_MAIN
+#define CPS_HELP
+#define CPS_TEST
 // #define CPS_CAT

@@ -22,10 +22,11 @@
 #define isWildCard(ch)  (((ch) == '*') || ((ch) == '?') || ((ch) == '['))
 
 struct Applet {
-	const	char*	name;
-	int	(*main)(int argc, char** argv);
+	const char* name;
+	int (*main)(int argc, char** argv);
 };
 
 extern int cpshell_main(int argc, char** argv);
+extern int testfunc_main(int argc, char** argv);
 
 #endif /* _INTERNAL_H_ */

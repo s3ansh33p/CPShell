@@ -139,10 +139,8 @@ void kbEnter() {
 				// tmp testing command
 				if (terminal->bufferIn[0] == 'a') {
 					// test data for now
-					char callingProg[] = "/fls0/cpshell/cpshell.exe";
-					char newProgName[] = "test.exe";
-					char callingArgs[] = "Hewlkdlfgj kdflglk Jljjkhj shfjhjj hj";
-					int argc = 2;
+					char callingArgs[] = "test -i something -o somethingelse"; // will be buffer
+					int argc = 0;
 					// count number spaces in callingArgs
 					for (int i = 0; i < strlen(callingArgs); i++) {
 						if (callingArgs[i] == ' ') {
@@ -155,12 +153,8 @@ void kbEnter() {
 					}
 					// create instance of argv
 					char** argv = new char*[argc];
-					// set index 0 to callingProg
-					argv[0] = callingProg;
-					// set index 1 to newProgName
-					argv[1] = newProgName;
 					// split callingArgs into argv
-					int argvIndex = 2;
+					int argvIndex = 0;
 					
 					char currentArg[ARGV_SIZE];
 					int currentArgIndex = 0;
@@ -186,7 +180,8 @@ void kbEnter() {
 					argv[argvIndex][currentArgIndex] = '\0';
 
 					// call cpshell_main
-					cpshell_main(argc, argv);
+					testfunc_main(argc, argv);
+					psuedo_main(argc, argv);
 
 					// call cpshell_main
 					// set var test to be char ** and have "test"
