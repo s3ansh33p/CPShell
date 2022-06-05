@@ -15,6 +15,9 @@
 #define BUF_SIZE        512
 #define EXPAND_ALLOC    256
 #define ARGV_SIZE       64
+#define APPLET_SIZE     64
+
+#define CPS_VERSION     "0.1.0"
 
 #define isBlank(ch)     (((ch) == ' ') || ((ch) == '\t'))
 #define isDecimal(ch)   (((ch) >= '0') && ((ch) <= '9'))
@@ -22,11 +25,15 @@
 #define isWildCard(ch)  (((ch) == '*') || ((ch) == '?') || ((ch) == '['))
 
 struct Applet {
-	const char* name;
+	char name[APPLET_SIZE];
 	int (*main)(int argc, char** argv);
 };
 
+static struct Applet applets[7]; // length is num funcs + 1 for empty
+
 extern int cpshell_main(int argc, char** argv);
-extern int testfunc_main(int argc, char** argv);
+
+// Tracks the main Shell loop
+bool shell_running = true;
 
 #endif /* _INTERNAL_H_ */

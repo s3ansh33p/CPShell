@@ -10,29 +10,25 @@
 // shell
 #include "src/internal.hpp" // definitions
 #include "src/terminal.hpp"
+#include "src/virtual_keyboard.hpp"
 
 // Terminal pointer
 Terminal* terminal;
 
+// Virtual Keyboard pointer
+VirtualKeyboard* keyboard;
+
 #include "src/cpshell.cpp"
-#include "src/virtual_keyboard.hpp"
 
 #ifndef PC
 	APP_NAME("CP Shell")
 	APP_DESCRIPTION("A calculator shell, with file handling, memory management, breakpoints, and a lot more.")
 	APP_AUTHOR("s3ansh33p")
-	APP_VERSION("0.0.1")
+	APP_VERSION(CPS_VERSION)
 #endif
-
-
-// Tracks the main Shell loop
-bool shell_running = true;
 
 // RNG pointer
 RandomGenerator* rng;
-
-// Virtual Keyboard pointer
-VirtualKeyboard* keyboard;
 
 // Ends the Shell and is called by the event handler
 void endShell() {
@@ -119,112 +115,63 @@ void kbEnter() {
 		if (keyboard->xcursor == 2) {
 			// enter
 			// store buffer
-			char buf[BUF_SIZE];
-			for (int i = 0; i < terminal->bufferInPos; i++) {
-				buf[i] = terminal->bufferIn[i];
-			}
-			terminal->HideCursor();
-			terminal->bufferCY++;
+			if (terminal->bufferInPos != 0) {
+				terminal->HideCursor();
+				terminal->bufferCY++;
 
-			// read current buffer
-			// check for command "help"
-			// check for command "clear"
-			// else print error
-
-			// Todo: create a command handler class
-			
-			bool validCommandFound = false;
-
-			if (terminal->bufferInPos == 1) {
-				// tmp testing command
-				if (terminal->bufferIn[0] == 'a') {
-					// test data for now
-					char callingArgs[] = "test -i something -o somethingelse"; // will be buffer
-					int argc = 0;
-					// count number spaces in callingArgs
-					for (int i = 0; i < strlen(callingArgs); i++) {
-						if (callingArgs[i] == ' ') {
-							argc++;
-						}
-					}
-					// check if final space is in callingArgs
-					if (callingArgs[strlen(callingArgs) - 1] != ' ') {
+				// copy bufferIn to callingArgs
+				char callingArgs[BUF_SIZE];
+				for (int i = 0; i < terminal->bufferInPos; i++) {
+					callingArgs[i] = terminal->bufferIn[i];
+				}
+				// add space to end
+				callingArgs[terminal->bufferInPos] = '\0';
+				int argc = 0;
+				// count number spaces in callingArgs
+				for (int i = 0; i < strlen(callingArgs); i++) {
+					if (callingArgs[i] == ' ') {
 						argc++;
 					}
-					// create instance of argv
-					char** argv = new char*[argc];
-					// split callingArgs into argv
-					int argvIndex = 0;
-					
-					char currentArg[ARGV_SIZE];
-					int currentArgIndex = 0;
-					for (int i = 0; i < strlen(callingArgs); i++) {
-						if (callingArgs[i] == ' ') {
-							argv[argvIndex] = new char[currentArgIndex + 1];
-							for (int j = 0; j < currentArgIndex; j++) {
-								argv[argvIndex][j] = currentArg[j];
-							}
-							argv[argvIndex][currentArgIndex] = '\0';
-							argvIndex++;
-							currentArgIndex = 0;
-						} else {
-							currentArg[currentArgIndex] = callingArgs[i];
-							currentArgIndex++;
+				}
+				// check if final space is in callingArgs
+				if (callingArgs[strlen(callingArgs) - 1] != ' ') {
+					argc++;
+				}
+				// create instance of argv
+				char** argv = new char*[argc];
+				// split callingArgs into argv
+				int argvIndex = 0;
+				
+				char currentArg[ARGV_SIZE];
+				int currentArgIndex = 0;
+				for (int i = 0; i < strlen(callingArgs); i++) {
+					if (callingArgs[i] == ' ') {
+						argv[argvIndex] = new char[currentArgIndex + 1];
+						for (int j = 0; j < currentArgIndex; j++) {
+							argv[argvIndex][j] = currentArg[j];
 						}
+						argv[argvIndex][currentArgIndex] = '\0';
+						argvIndex++;
+						currentArgIndex = 0;
+					} else {
+						currentArg[currentArgIndex] = callingArgs[i];
+						currentArgIndex++;
 					}
-					// set last argv to last arg
-					argv[argvIndex] = new char[currentArgIndex + 1];
-					for (int j = 0; j < currentArgIndex; j++) {
-						argv[argvIndex][j] = currentArg[j];
-					}
-					argv[argvIndex][currentArgIndex] = '\0';
+				}
+				// set last argv to last arg
+				argv[argvIndex] = new char[currentArgIndex + 1];
+				for (int j = 0; j < currentArgIndex; j++) {
+					argv[argvIndex][j] = currentArg[j];
+				}
+				argv[argvIndex][currentArgIndex] = '\0';
 
-					// call cpshell_main
-					testfunc_main(argc, argv);
-					psuedo_main(argc, argv);
-
-					// call cpshell_main
-					// set var test to be char ** and have "test"
-					// char** test = new char*[2];
-					// test[0] = "test";
-					// cpshell_main(1, test);
-					validCommandFound = true;
-				}
-			} else if (terminal->bufferInPos == 4) {
-				if ((buf[0] == 'h' || buf[0] == 'H') && (buf[1] == 'e' || buf[1] == 'E') && (buf[2] == 'l' || buf[2] == 'L') && (buf[3] == 'p' || buf[3] == 'P')) {
-					// clear buffer
-					terminal->ClearBuffer();
-					char help[] = "help: prints this help message\nclear: clears the terminal\nexit: exits the shell\n";
-					terminal->WriteChars(help);
-					validCommandFound = true;
-					// exit
-				} else if ((buf[0] == 'e' || buf[0] == 'E') && (buf[1] == 'x' || buf[1] == 'X') && (buf[2] == 'i' || buf[2] == 'I') && (buf[3] == 't' || buf[3] == 'T')) {
-					// exit
-					endShell();
-					validCommandFound = true;
-				}
-			} else if (terminal->bufferInPos == 5) {
-				if ((buf[0] == 'c' || buf[0] == 'C') && (buf[1] == 'l' || buf[1] == 'L') && (buf[2] == 'e' || buf[2] == 'E') && (buf[3] == 'a' || buf[3] == 'A') && (buf[4] == 'r' || buf[4] == 'R')) {
-					// clear the screen to black
-					fillScreen(0);
-					// rerender the keyboard
-					keyboard->Render();
-					// keyboard highlight
-					keyboard->Highlight(keyboard->xcursor, keyboard->ycursor);
-					// clear buffer done later for us
-					// reset terminal y
-					terminal->bufferCY = 0;
-					validCommandFound = true;
-				}
-			}
-			if (!validCommandFound) {
-				// clear buffer
-				terminal->ClearBuffer();
-				char error[27] = "error: command not found\n";
-				terminal->WriteChars(error);
-			}
+				// call cpshell_main
+				// testfunc_main(argc, argv);
+				psuedo_main(argc, argv);
 
 			terminal->ClearBuffer();
+			}
+			// else ignore as it is a blank line
 
 		} else if (keyboard->xcursor == 1) {
 			// back
@@ -275,8 +222,8 @@ void main2() {
 	addListener2(KEY_DOWN, kbDown); // down cursor
 	addListener(KEY_EXE, kbEnter); // send the key
 
-	char welcomeMessage[] = "Welcome to CPShell!\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nType 'help' for a list of commands.\n\n\n";
-	terminal->WriteChars(welcomeMessage);
+	// Initialize the shell
+	cpshell_init();
 
 	LCD_Refresh();
 

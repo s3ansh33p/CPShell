@@ -8,7 +8,7 @@ class Terminal {
 	public: 
 		void ClearBuffer();
 		void WriteBuffer(char c, bool hideCursor = true);
-		void WriteChars(char* charArray);
+		void WriteChars(char* charArray, bool skipClear = false);
 		void RemoveLast();
 		void ShowCursor();
 		void HideCursor();
@@ -77,13 +77,13 @@ void Terminal::WriteBuffer(char c, bool hideCursor) {
  * Terminal* terminal;
  * terminal->WriteChars(myMessage);
  */
-void Terminal::WriteChars(char *charArray) {
+void Terminal::WriteChars(char *charArray, bool skipClear) {
 	int len = strlen(charArray);
 	for (int i = 0; i < len; i++) {
 		this->WriteBuffer(charArray[i], false);
 	}
 	// clear the buffer
-	this->ClearBuffer();
+	if (!skipClear) this->ClearBuffer();
 }
 
 void Terminal::RemoveLast() {

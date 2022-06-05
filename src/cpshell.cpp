@@ -2,55 +2,14 @@
 
 #include "../lib/functions/convert.hpp"
 
+// commands
+#include "commands/clear.cpp"
+#include "commands/credits.cpp"
+#include "commands/exit.cpp"
+#include "commands/help.cpp"
+#include "commands/test.cpp"
+
 static int been_there_done_that = 0;
-
-static const struct Applet applets[] = {
-
-#ifdef CPS_MAIN		//bin
-    {"cpshell", cpshell_main},
-#endif
-#ifdef CPS_TEST		//bin
-    {"test", testfunc_main},
-#endif
-    {0}
-};
-
-// argc is the number of arguments
-// argv is the array of arguments
-// argv[0] is the calling program name
-// argv[1] is the path to the current program
-// argv[2] is the first argument
-// argv[3] is the second argument
-// argv[n-2] is the nth argument
-int testfunc_main(int argc, char **argv)
-{
-    terminal->ClearBuffer();
-    if (argc < 2)
-    {
-        // char message[] = "Usage: %s <command> [<args>]\n", argv[0];
-        char message[] = "Usage: ";
-        strcat(message, argv[0]);
-        strcat(message, " <command> [<args>]\n");
-        
-        terminal->WriteChars(message);
-        return 1; // error
-    } else {
-        // print all arguments
-        for (int i = 0; i < argc; i++) {
-            terminal->WriteChars(argv[i]);
-            terminal->WriteBuffer('\n', false);
-        }
-        // print number of arguments
-        char message[] = "Number of arguments: ";
-        strcat(message, numToString(argc));
-        strcat(message, "\n\n");
-        terminal->WriteChars(message);
-    }
-    // output "test main" to the terminal
-    char message[] = "This is the actual result of the function\n";
-    terminal->WriteChars(message);
-    return 0; // return 0 on success
-};
 
 int psuedo_main(int argc, char **argv)
 {
@@ -63,15 +22,10 @@ int psuedo_main(int argc, char **argv)
 	    name = s;
     }
 
-    while (a->name != 0) {
+    while (a->name[0] != 0) {
         if (strcmp(name, a->name) == 0) {
-            // print name of program
-            char message[] = "Name of program: ";
-            strcat(message, name);
-            strcat(message, "\n");
-            terminal->WriteChars(message);
+            terminal->ClearBuffer();	
             int status;
-
             status = ((*(a->main)) (argc, argv));
             if (status < 0) {
                 char err[ARGV_SIZE];
@@ -86,30 +40,57 @@ int psuedo_main(int argc, char **argv)
     return (cpshell_main(argc, argv));
 }
 
-
 int cpshell_main(int argc, char **argv)
 {
     argc--;
     argv++;
 
     if (been_there_done_that == 1 || argc < 1) {
-        const struct Applet *a = applets;
+        Applet *a = applets;
         terminal->ClearBuffer();
         char msg[] = "Currently defined functions:\n";
         terminal->WriteChars(msg);
 
-        char prog_name[ARGV_SIZE];
-        while (a->name != 0) {
-            strcpy(prog_name, (a++)->name);
-            strcat(prog_name, "\n");
-            terminal->WriteChars(prog_name);
+        char cmds[APPLET_SIZE];
+        while (a->name[0] != 0) {
+            strcpy(cmds, (a++)->name);
+            // check if terminal->bufferCX is at the end of the line + 2 for ', '
+            if ((terminal->bufferCX + strlen(a->name) + 2) >= terminal->xmax) {
+                terminal->WriteBuffer('\n', false);
+                terminal->ClearBuffer();
+            } else {
+                strcat(cmds, ", ");
+            }
+            terminal->WriteChars(cmds, true);
         }
+        // remove last comma
+        terminal->RemoveLast();
+        terminal->RemoveLast();
         terminal->WriteBuffer('\n', false);
-
         return -1;
     } else {
         /* If we've already been here once, exit now */
         been_there_done_that = 1;
         return (psuedo_main(argc, argv));
     }
+}
+
+void cpshell_init() {
+    // init applets
+    strcpy(applets[0].name, "help");
+    applets[0].main = help_main;
+    strcpy(applets[1].name, "test");
+    applets[1].main = test_main;
+    strcpy(applets[2].name, "clear");
+    applets[2].main = clear_main;
+    strcpy(applets[3].name, "exit");
+    applets[3].main = exit_main;
+    strcpy(applets[4].name, "credits");
+    applets[4].main = credits_main;
+
+    memset(&applets[5], 0, sizeof(Applet));
+
+    // welcome
+	char welcomeMessage[] = "Welcome to CPShell!\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nType 'help' for a list of commands.\n\n\n";
+	terminal->WriteChars(welcomeMessage);
 }
