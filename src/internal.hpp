@@ -24,12 +24,23 @@
 #define isOctal(ch)     (((ch) >= '0') && ((ch) <= '7'))
 #define isWildCard(ch)  (((ch) == '*') || ((ch) == '?') || ((ch) == '['))
 
+// Files
+
+struct dirEntry{
+	char fileName[100];
+	char type;
+};
+struct dirEntry directory[64];
+
+char g_path[400];
+wchar_t g_wpath[400];
+
 struct Applet {
 	char name[APPLET_SIZE];
 	int (*main)(int argc, char** argv);
 };
 
-static struct Applet applets[7]; // length is num funcs + 1 for empty
+static struct Applet applets[8]; // length is num funcs + 1 for empty
 
 extern int cpshell_main(int argc, char** argv);
 

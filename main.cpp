@@ -168,8 +168,8 @@ void kbEnter() {
 				// call cpshell_main
 				// testfunc_main(argc, argv);
 				psuedo_main(argc, argv);
-
-			terminal->ClearBuffer();
+				// display host after psuedo_main
+				display_host();
 			}
 			// else ignore as it is a blank line
 
@@ -224,6 +224,8 @@ void main2() {
 
 	// Initialize the shell
 	cpshell_init();
+	// Display Host
+	display_host();
 
 	LCD_Refresh();
 

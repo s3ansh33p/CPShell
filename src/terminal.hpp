@@ -1,3 +1,11 @@
+/**
+ * @file terminal.hpp
+ * @author Sean McGinty (newfolderlocation@gmail.com)
+ * @brief A terminal class for CPShell, which handles all terminal input and output.
+ * @version 1.1
+ * @date 2022-06-09
+ */
+
 #pragma once
 
 #include "../calc.hpp"
@@ -13,6 +21,8 @@ class Terminal {
 		void ShowCursor();
 		void HideCursor();
 		void SetFont(uint8_t* font);
+		void SetColor(uint32_t newColor);
+		void SetCursorColor(uint32_t newColor);
 		// buffer for command input
 		char bufferIn[BUF_SIZE];
 		int8_t bufferInPos = 0;
@@ -27,6 +37,8 @@ class Terminal {
 		int16_t termWidth = width - xmargin * 2;
 		int16_t termHeight = 40;
 		int16_t xmax = termWidth / xmargin;
+		uint32_t color = 0xFFFF; // white
+		uint32_t cursorColor = 0xFFFF; // white
 };
 
 void Terminal::SetFont(uint8_t* font) {
@@ -57,7 +69,7 @@ void Terminal::WriteBuffer(char c, bool hideCursor) {
 		char buf[2] = {c, '\0'};
 
 		// draw the character
-		DRAW_FONT(this->font, buf, this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, color(255,255,255), this->termWidth);
+		DRAW_FONT(this->font, buf, this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->color, this->termWidth);
 
 		// check for overflow on screen
 		if (this->bufferCX < this->xmax) {
@@ -106,11 +118,21 @@ void Terminal::RemoveLast() {
 // Cursor Show
 void Terminal::ShowCursor() {
 	// draw the cursor
-	drawFilledRectangle(this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->xmargin, this->ymargin, color(255,255,255));
+	drawFilledRectangle(this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->xmargin, this->ymargin, this->cursorColor);
 }
 
 // Cursor Hide
 void Terminal::HideCursor() {
 	// draw the cursor
 	drawFilledRectangle(this->bufferOffsetX + this->bufferCX * this->xmargin, this->bufferOffsetY + this->bufferCY * this->ymargin, this->xmargin, this->ymargin, 0); // 0 is always color black / 0,0,0
+}
+
+// Set Color
+void Terminal::SetColor(uint32_t newColor) {
+	this->color = newColor;
+}
+
+// Set Cursor Color
+void Terminal::SetCursorColor(uint32_t newColor) {
+	this->cursorColor = newColor;
 }

@@ -1,15 +1,37 @@
 #pragma once
 
 #include "../lib/functions/convert.hpp"
+#include "internal.hpp"
 
 // commands
 #include "commands/clear.cpp"
 #include "commands/credits.cpp"
 #include "commands/exit.cpp"
 #include "commands/help.cpp"
+#include "commands/ls.cpp"
 #include "commands/test.cpp"
 
 static int been_there_done_that = 0;
+
+void display_host() {
+    // will be /fls0/path/to/current/directory/
+    terminal->ClearBuffer();
+    terminal->SetColor(color(0,255,0));
+    char host[16] = "root@cp:";
+    terminal->WriteChars(host, true);
+
+    terminal->SetColor(color(0,0,255));
+    terminal->WriteChars(g_path, true);
+
+    terminal->SetColor(0xFFFF); //white
+    // add "$" character
+    terminal->WriteBuffer('$', false);
+    // add space
+    terminal->WriteBuffer(' ', false);
+    
+    // reset bufferPosition
+    terminal->bufferInPos = 0;
+}
 
 int psuedo_main(int argc, char **argv)
 {
@@ -28,6 +50,7 @@ int psuedo_main(int argc, char **argv)
             int status;
             status = ((*(a->main)) (argc, argv));
             if (status < 0) {
+                terminal->ClearBuffer();
                 char err[ARGV_SIZE];
                 strcat(err, a->name);
                 strcat(err, ": An error occurred\n");
@@ -87,8 +110,31 @@ void cpshell_init() {
     applets[3].main = exit_main;
     strcpy(applets[4].name, "credits");
     applets[4].main = credits_main;
+    strcpy(applets[5].name, "ls");
+    applets[5].main = ls_main;
 
-    memset(&applets[5], 0, sizeof(Applet));
+    memset(&applets[6], 0, sizeof(Applet));
+
+    // init file system
+    // Reference: SnailMath/filemgr
+
+    //initialize g_path
+	memset(g_path,0,sizeof(g_path));
+	strcpy (g_path, "\\fls0\\");
+
+    //convert from char to wchar
+    for(int i=0; g_path[i]!=0; i++){
+        wchar_t ch = g_path[i];
+        g_wpath[i] = ch;
+    }
+    
+    //add the * to the file path 
+    {
+        int i=0;
+        while(g_wpath[i]!=0)i++; //seek to the end of the string
+        g_wpath[i++]='*'; //add an *
+        g_wpath[i  ]= 0 ; //add the 0
+    }
 
     // welcome
 	char welcomeMessage[] = "Welcome to CPShell!\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nType 'help' for a list of commands.\n\n\n";
