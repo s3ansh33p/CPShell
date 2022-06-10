@@ -1,4 +1,5 @@
 // draw_functions.hpp by InterChan
+// minor changes by s3ansh33p for new file structure
 
 // these functions allow you to read and display the converted textures and fonts converted with convert_textures.py and convert_fonts.py
 // remember to free() the texture pointers when you stop using them (for example when you exit to the main menu you can free the ingame textures)
@@ -21,7 +22,8 @@ free(menuFont);
 #pragma once
 
 // change the last folder name below to your game folder name in the converted "res" folder
-#define PATH_PREFIX "\\fls0\\res\\CPShell\\"
+#define PATH_PREFIX "\\fls0\\usr\\textures\\CPShell\\"
+// #define FONT_PREFIX "\\fls0\\usr\\fonts\\CPShell" // I don't use this, but you can if you want to 
 
 #include <sdk/os/file.hpp>
 #include <sdk/os/mem.hpp>
@@ -49,7 +51,7 @@ uint16_t *load_texture(const char *texturepath) {
 	#ifdef PATH_PREFIX
 		strcpy(concatpath, PATH_PREFIX);
 	#else
-		strcpy(concatpath, "\\fls0\\res\\");
+		strcpy(concatpath, "\\fls0\\usr\\textures\\"); // try not to do this, it's a bad idea
 	#endif
 	strcat(concatpath, texturepath);
 	int fd = open(concatpath, OPEN_READ);
@@ -83,10 +85,10 @@ void draw_texture_shader(uint16_t *texturepointer, int16_t x, int16_t y, uint16_
 
 uint8_t *load_font(const char *fontpath) {
 	char concatpath[128];
-	#ifdef PATH_PREFIX
-		strcpy(concatpath, PATH_PREFIX);
+	#ifdef FONT_PREFIX
+		strcpy(concatpath, FONT_PREFIX);
 	#else
-		strcpy(concatpath, "\\fls0\\res\\");
+		strcpy(concatpath, "\\fls0\\usr\\fonts\\");
 	#endif
 	strcat(concatpath, fontpath);
 	int fd = open(concatpath, OPEN_READ);

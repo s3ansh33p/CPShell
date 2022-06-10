@@ -189,7 +189,7 @@ void kbEnter() {
 void main2() {
 
 	// load the textures and fonts
-	LOAD_FONT_PTR("fnt\\7x8", f_7x8);
+	LOAD_FONT_PTR("7x8", f_7x8);
 	
 	fillScreen(0); // clear the screen to black (0,0,0)
 
