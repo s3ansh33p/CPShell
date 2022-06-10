@@ -47,7 +47,6 @@ extern int ls_main(int argc, char **argv)
         uint32_t newColor = thisfile.type=='D'?color(255,0,0):0xFFFF; // red for directories, white for files
         terminal->SetColor(newColor);
         terminal->WriteChars(outBuf, true);
-        LCD_Refresh();
         //save this dirEntry to directory
         directory[dirFiles++] = thisfile;
         

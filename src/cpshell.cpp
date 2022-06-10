@@ -4,12 +4,13 @@
 #include "internal.hpp"
 
 // commands
+#include "commands/cd.cpp"
 #include "commands/clear.cpp"
 #include "commands/credits.cpp"
+#include "commands/echo.cpp"
 #include "commands/exit.cpp"
 #include "commands/help.cpp"
 #include "commands/ls.cpp"
-#include "commands/test.cpp"
 
 static int been_there_done_that = 0;
 
@@ -102,8 +103,8 @@ void cpshell_init() {
     // init applets
     strcpy(applets[0].name, "help");
     applets[0].main = help_main;
-    strcpy(applets[1].name, "test");
-    applets[1].main = test_main;
+    strcpy(applets[1].name, "echo");
+    applets[1].main = echo_main;
     strcpy(applets[2].name, "clear");
     applets[2].main = clear_main;
     strcpy(applets[3].name, "exit");
@@ -112,15 +113,17 @@ void cpshell_init() {
     applets[4].main = credits_main;
     strcpy(applets[5].name, "ls");
     applets[5].main = ls_main;
+    strcpy(applets[6].name, "cd");
+    applets[6].main = cd_main;
 
-    memset(&applets[6], 0, sizeof(Applet));
+    memset(&applets[7], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr
 
-    //initialize g_path
+    //initialize g_path to home ("\\fls0\\")
 	memset(g_path,0,sizeof(g_path));
-	strcpy (g_path, "\\fls0\\");
+	strcpy (g_path, g_home);
 
     //convert from char to wchar
     for(int i=0; g_path[i]!=0; i++){

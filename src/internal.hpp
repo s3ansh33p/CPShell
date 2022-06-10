@@ -11,7 +11,7 @@
 #define FALSE   ((int) 1)
 #define TRUE    ((int) 0)
 
-#define PATH_LEN        256
+#define PATH_LEN        400
 #define BUF_SIZE        512
 #define EXPAND_ALLOC    256
 #define ARGV_SIZE       64
@@ -32,15 +32,16 @@ struct dirEntry{
 };
 struct dirEntry directory[64];
 
-char g_path[400];
-wchar_t g_wpath[400];
+char g_path[PATH_LEN];
+wchar_t g_wpath[PATH_LEN];
+char g_home[PATH_LEN] = "\\fls0\\"; // default home for now
 
 struct Applet {
 	char name[APPLET_SIZE];
 	int (*main)(int argc, char** argv);
 };
 
-static struct Applet applets[8]; // length is num funcs + 1 for empty
+static struct Applet applets[9]; // length is num funcs + 1 for empty
 
 extern int cpshell_main(int argc, char** argv);
 
