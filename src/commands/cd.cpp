@@ -2,8 +2,8 @@
  * @file cd.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
  * @brief Changes the current working directory.
- * @version 1.0
- * @date 2022-06-10
+ * @version 1.1
+ * @date 2022-06-12
  */
 
 #include "../internal.hpp"
@@ -32,7 +32,10 @@ extern int cd_main(int argc, char **argv)
         // path does not exist
         strcpy(outBuf, "Path does not exist.\n");
         terminal->WriteChars(outBuf);
-        return -1; // will need to change this in the future
+        
+        // close the file
+        findClose(findHandle);
+        return 0;
     }
 
     // path exists, check if it is a directory
@@ -40,7 +43,10 @@ extern int cd_main(int argc, char **argv)
         // path is not a directory
         strcpy(outBuf, "Path is not a directory.\n");
         terminal->WriteChars(outBuf);
-        return -1;
+        
+        // close the file
+        findClose(findHandle);
+        return 0;
     }
 
     // close the file

@@ -4,6 +4,7 @@
 #include "internal.hpp"
 
 // commands
+#include "commands/cat.cpp"
 #include "commands/cd.cpp"
 #include "commands/clear.cpp"
 #include "commands/credits.cpp"
@@ -115,8 +116,10 @@ void cpshell_init() {
     applets[5].main = ls_main;
     strcpy(applets[6].name, "cd");
     applets[6].main = cd_main;
+    strcpy(applets[7].name, "cat");
+    applets[7].main = cat_main;
 
-    memset(&applets[7], 0, sizeof(Applet));
+    memset(&applets[8], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr

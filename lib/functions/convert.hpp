@@ -12,3 +12,14 @@ char *numToString(int num) {
     str[i] = '\0';
     return str;
 }
+
+// conert char array to int without using library functions
+int stringToNum(char *str) {
+    int num = 0;
+    int i = 0;
+    while (str[i] != '\0') {
+        num = num * 10 + str[i] - '0';
+        i++;
+    }
+    return num;
+}
