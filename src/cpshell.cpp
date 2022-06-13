@@ -83,9 +83,8 @@ int cpshell_main(int argc, char **argv)
             if ((terminal->bufferCX + strlen(a->name) + 2) >= terminal->xmax) {
                 terminal->WriteBuffer('\n', false);
                 terminal->ClearBuffer();
-            } else {
-                strcat(cmds, ", ");
             }
+            strcat(cmds, ", ");
             terminal->WriteChars(cmds, true);
         }
         // remove last comma

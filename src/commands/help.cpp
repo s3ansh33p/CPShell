@@ -2,8 +2,8 @@
  * @file help.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
  * @brief Displays help information.
- * @version 1.0
- * @date 2022-06-06
+ * @version 1.1
+ * @date 2022-06-13
  */
 
 #include "../internal.hpp"
@@ -25,9 +25,8 @@ extern int help_main(int argc, char **argv)
         if ((terminal->bufferCX + strlen(a->name) + 2) >= terminal->xmax) {
             terminal->WriteBuffer('\n', false);
             terminal->ClearBuffer();
-        } else {
-            strcat(cmds, ", ");
         }
+        strcat(cmds, ", ");
         terminal->WriteChars(cmds, true);
     }
     // remove last comma
