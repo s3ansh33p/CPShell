@@ -94,7 +94,7 @@ extern int cat_main(int argc, char **argv)
         numChars = stringToNum(argv[2]);
     }
 
-    for (int i = 0; i < numChars; i++) {
+    for (uint32_t i = 0; i < numChars; i++) {
         // check if we are at the end of the file
         if (ch == 0) {
             // we are at the end of the file

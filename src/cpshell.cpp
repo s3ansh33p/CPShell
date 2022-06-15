@@ -2,6 +2,7 @@
 
 #include "../lib/functions/convert.hpp"
 #include "internal.hpp"
+#include "utilities.hpp" // history
 
 // commands
 #include "commands/cat.cpp"
@@ -11,6 +12,7 @@
 #include "commands/echo.cpp"
 #include "commands/exit.cpp"
 #include "commands/help.cpp"
+#include "commands/history.cpp"
 #include "commands/ls.cpp"
 
 static int been_there_done_that = 0;
@@ -44,6 +46,14 @@ int psuedo_main(int argc, char **argv)
     while (*s != '\0') {
 	if (*s++ == '/')
 	    name = s;
+    }
+
+    int hist_status;
+    hist_status = add_history(argc, argv);
+    if (hist_status != 0) {
+        char err_msg[BUF_SIZE];
+        strcpy(err_msg, "Error adding to history.\n");
+        terminal->WriteChars(err_msg);
     }
 
     while (a->name[0] != 0) {
@@ -117,8 +127,10 @@ void cpshell_init() {
     applets[6].main = cd_main;
     strcpy(applets[7].name, "cat");
     applets[7].main = cat_main;
+    strcpy(applets[8].name, "history");
+    applets[8].main = history_main;
 
-    memset(&applets[8], 0, sizeof(Applet));
+    memset(&applets[9], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr
