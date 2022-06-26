@@ -9,6 +9,7 @@
 #include "commands/cd.cpp"
 #include "commands/clear.cpp"
 #include "commands/credits.cpp"
+#include "commands/date.cpp"
 #include "commands/echo.cpp"
 #include "commands/exit.cpp"
 #include "commands/help.cpp"
@@ -129,8 +130,10 @@ void cpshell_init() {
     applets[7].main = cat_main;
     strcpy(applets[8].name, "history");
     applets[8].main = history_main;
+    strcpy(applets[9].name, "date");
+    applets[9].main = date_main;
 
-    memset(&applets[9], 0, sizeof(Applet));
+    memset(&applets[10], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr

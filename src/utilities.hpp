@@ -2,12 +2,47 @@
  * @file utilities.hpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
  * @brief Utility functions for the CPShell.
- * @version 1.0
- * @date 2022-06-15
+ * @version 1.1
+ * @date 2022-06-27
  */
 
 #include "internal.hpp"
 #include <sdk/os/file.hpp>
+
+// "Safe" file operations
+int safe_internal(int ret, char *msg) {
+    if (ret < 0) {
+        terminal->WriteChars(msg);
+        close(ret);
+        return -1;
+    }
+    return ret;
+}
+
+int safe_read(int fd, char *buf, int len) {
+    int ret = read(fd, buf, len);
+    return safe_internal(ret, "An error occurred calling read.\n");
+}
+
+int safe_write(int fd, char *buf, int len) {
+    int ret = write(fd, buf, len);
+    return safe_internal(ret, "An error occurred calling write.\n");
+}
+
+int safe_open(char *path, int flags) {
+    int ret = open(path, flags);
+    return safe_internal(ret, "An error occurred calling open.\n");
+}
+
+int safe_close(int fd) {
+    int ret = close(fd);
+    return safe_internal(ret, "An error occurred calling close.\n");
+}
+
+int safe_lseek(int fd, int offset, int whence) {
+    int ret = lseek(fd, offset, whence);
+    return safe_internal(ret, "An error occurred calling lseek.\n");
+}
 
 // write to history file with int argc, char **argv 
 int add_history(int argc, char **argv) {
@@ -32,7 +67,7 @@ int add_history(int argc, char **argv) {
             return -1;
         }
         // close the file
-        close(fd);
+        safe_close(fd);
 
     // history file exists, check if it is a directory
     } else if (findInfoBuf.type == findInfoBuf.EntryTypeDirectory) {
@@ -46,46 +81,27 @@ int add_history(int argc, char **argv) {
     findClose(findHandle);
 
     // history file exists, add to it
-    int fd = open(g_history, OPEN_WRITE);
-    if (fd < 0) {
-        // An error occurred calling open
-        strcpy(outBuf, "An error occurred calling open.\n");
-        terminal->WriteChars(outBuf);
-        close(fd);
-        return -1;
-    }
+    int fd = safe_open(g_history, OPEN_WRITE);
 
     // write to the end of the file
-    lseek(fd, 0, SEEK_END);
+    safe_lseek(fd, 0, SEEK_END);
 
     // write to file
-    // for now just do first argv
-    ret = write(fd, argv[0], strlen(argv[0]));
-     if (ret < 0) {
-        // An error occurred calling write
-        strcpy(outBuf, "An error occurred calling write.\n");
-        terminal->WriteChars(outBuf);
-        close(fd);
-        return -1;
-    }
-    // write newline
-    ret = write(fd, "\n", 1);
-    if (ret < 0) {
-        // An error occurred calling write
-        strcpy(outBuf, "An error occurred calling write.\n");
-        terminal->WriteChars(outBuf);
-        close(fd);
-        return -1;
+    for (int i = 0; i < argc; i++) {
+        strcpy(outBuf, argv[i]);
+        safe_write(fd, outBuf, strlen(outBuf));
+        // add a space between arguments
+        if (i < argc - 1) {
+            strcpy(outBuf, " ");
+            safe_write(fd, outBuf, strlen(outBuf));
+        }
     }
 
+    // write newline
+    safe_write(fd, "\n", 1);
+
     // close the file
-    ret = close(fd);
-    if (ret < 0) {
-        // An error occurred calling close
-        strcpy(outBuf, "An error occurred calling close.\n");
-        terminal->WriteChars(outBuf);
-        return -1;
-    }
+    safe_close(fd);
 
     return 0; // return 0 on success
 }

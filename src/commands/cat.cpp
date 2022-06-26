@@ -23,9 +23,9 @@ extern int cat_main(int argc, char **argv)
         return 0;
     }
 
-    // build path
     char path[PATH_LEN];
-    strcpy(path, g_path);
+    // check if path given starts with '\\'
+    if (argv[1][0] != '\\') strcpy(path, g_path);
     strcat(path, argv[1]);
     // convert to wchar_t
     wchar_t wpath[PATH_LEN];

@@ -58,9 +58,9 @@ Note that the classpad only supports folders that are 3 levels deep
  ┃ ┣ 📂ponggers2 (example)
  ┃ ┃ ┣ 📜ball
  ┃ ┃ ┗ 📜ball_trail
- ┃ ┃ ┣ 📂CPFlappyBird (example)
- ┃ ┃ ┃ ┣ 📜background
- ┃ ┃ ┃ ┗ 📜flappy0
+ ┃ ┣ 📂CPFlappyBird (example)
+ ┃ ┃ ┣ 📜background
+ ┃ ┃ ┗ 📜flappy0
  ┃ ┣ 📂fonts (for fonts through Interchan's texture code, in one folder as everything uses same fonts)
  ┃ ┃ ┣ 📜5x6
  ┃ ┃ ┗ 📜7x8
