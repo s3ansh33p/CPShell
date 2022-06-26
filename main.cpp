@@ -52,7 +52,7 @@ void kbLeft() {
 	}
 }
 void kbRight() {
-	if (keyboard->xcursor < 21 || (keyboard->xcursor < 1 && keyboard->ycursor == 3)) {
+	if (keyboard->xcursor < 2 || (keyboard->xcursor < 21 && keyboard->ycursor != 3)) {
 		keyboard->Highlight(keyboard->xcursor, keyboard->ycursor, keyboard->keyColor, true);
 		keyboard->xcursor++;
 		keyboard->Highlight(keyboard->xcursor, keyboard->ycursor);
