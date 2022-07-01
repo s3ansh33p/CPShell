@@ -15,7 +15,7 @@ extern int date_main(int argc, char **argv)
     if (argc > 1 && argv[1][0] == '-') {
         // check if second argument is '-h'
         if (strcmp(argv[1], "-h") == 0) {
-            strcpy(outBuf, "Date: Displays system date and time.\nUsage: date\n-h: Displays this help message.\n-d: Displays the date.\n-t: Displays the time.\n-s: Sets the date and time.\n\n-s  <sec> <min> <hr> <day> <mnth> <yr>\n-s  [sec|seconds] <seconds>\n-s  [min|minutes] <minutes>\n-s  [hr|hours] <hours>\n-s  [day|days] <days>\n-s  [mnth|months] <months>\n-s  [yr|years] <years>\n\nExamples\ndate -s min 50      Sets minutes to 50\ndate -s year 22     Sets year to 2022\n");
+            strcpy(outBuf, "Date: Displays system date and time.\nUsage: date\n-h: Displays this help message.\n-d: Displays the date.\n-t: Displays the time.\n-s: Sets the date and time.\n\n-s  <sec> <min> <hr> <day> <mnth> <yr>\n-s  [sec|seconds] <seconds>\n-s  [min|minutes] <minutes>\n-s  [hr|hours] <hours>\n-s  [day|days] <days>\n-s  [mnth|months] <months>\n-s  [yr|years] <years>\n\nExamples\ndate               Shows date & time\ndate -s min 50     Sets minutes to 50\ndate -s year 22    Sets year to 2022\n");
             terminal->WriteChars(outBuf);
             return 0;
         } else if (strcmp(argv[1], "-d") == 0) {

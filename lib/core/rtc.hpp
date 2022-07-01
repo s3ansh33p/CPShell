@@ -52,7 +52,9 @@ class RTC {
             setAny(RMONCNT, month);
         }
         void setYear(uint16_t year) {
-            setAny(RYRCNT, year);
+            regClearBit(RTC_START);
+            regWrite(RYRCNT, year);
+            regSetBit(RTC_START);
         }
 
         // up to 6 arguments are supported
@@ -110,12 +112,7 @@ class RTC {
             *regAddress(reg) = value;
         }
 
-        inline void setAny(Registers8 reg, uint8_t value) {
-            regClearBit(RTC_START);
-            regWrite(reg, value);
-            regSetBit(RTC_START);
-        }
-        inline void setAny(Registers16 reg, uint16_t value) {
+        void setAny(Registers8 reg, uint8_t value) {
             regClearBit(RTC_START);
             regWrite(reg, value);
             regSetBit(RTC_START);
