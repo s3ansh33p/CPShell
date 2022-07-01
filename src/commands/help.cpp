@@ -14,8 +14,8 @@ extern int help_main(int argc, char **argv)
     terminal->ClearBuffer();
     char msg[] = "Running CPShell Version ";
     strcat(msg, CPS_VERSION);
-    strcat(msg, "\nWritten by Sean McGinty\n");
-    //  (s3ansh33p)\nAdditional information in creditsCurrently defined functions:\n
+    strcat(msg, "\nWritten by Sean McGinty (s3ansh33p)\n");
+    // Additional information in creditsCurrently defined functions:\n
     terminal->WriteChars(msg);
 
     char cmds[APPLET_SIZE];

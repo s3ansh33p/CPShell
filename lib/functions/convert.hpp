@@ -1,7 +1,7 @@
 #pragma once
 
 // convert int to char without using library functions
-char *numToString(int num) {
+char *numToString(uint32_t num) {
     char *str = (char *)malloc(sizeof(char) * 10);
     int i = 0;
     while (num > 0) {
@@ -14,13 +14,19 @@ char *numToString(int num) {
 }
 
 // convert char array to int without using library functions
-int stringToNum(char *str) {
+uint32_t stringToNum(char *str) {
     int num = 0;
     int i = 0;
-    while (str[i] != '\0') {
-        num = num * 10 + str[i] - '0';
+    bool isNegative = false;
+    if(str[0] == '-'){
+        isNegative = true;
         i++;
     }
+    while (str[i] && (str[i] >= '0' && str[i] <= '9')){
+        num = num * 10 + (str[i] - '0');
+        i++;
+    }
+    if(isNegative) num = -1 * num;
     return num;
 }
 

@@ -27,9 +27,6 @@ VirtualKeyboard* keyboard;
 	APP_VERSION(CPS_VERSION)
 #endif
 
-// RNG pointer
-RandomGenerator* rng;
-
 // Ends the Shell and is called by the event handler
 void endShell() {
 	shell_running = false;
@@ -251,7 +248,6 @@ void main2() {
 
 		checkEvents();
 		
-		// Debug_Printf(10,31,true,0,"RNG: %i",rng->m_x);
 		// Debug_Printf(10,28,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
 
 		LCD_Refresh();

@@ -15,6 +15,7 @@
 #include "commands/help.cpp"
 #include "commands/history.cpp"
 #include "commands/ls.cpp"
+#include "commands/rand.cpp"
 
 static int been_there_done_that = 0;
 
@@ -112,28 +113,30 @@ int cpshell_main(int argc, char **argv)
 
 void cpshell_init() {
     // init applets
-    strcpy(applets[0].name, "help");
-    applets[0].main = help_main;
-    strcpy(applets[1].name, "echo");
-    applets[1].main = echo_main;
+    strcpy(applets[0].name, "cat");
+    applets[0].main = cat_main;
+    strcpy(applets[1].name, "cd");
+    applets[1].main = cd_main;
     strcpy(applets[2].name, "clear");
     applets[2].main = clear_main;
-    strcpy(applets[3].name, "exit");
-    applets[3].main = exit_main;
-    strcpy(applets[4].name, "credits");
-    applets[4].main = credits_main;
-    strcpy(applets[5].name, "ls");
-    applets[5].main = ls_main;
-    strcpy(applets[6].name, "cd");
-    applets[6].main = cd_main;
-    strcpy(applets[7].name, "cat");
-    applets[7].main = cat_main;
+    strcpy(applets[3].name, "credits");
+    applets[3].main = credits_main;
+    strcpy(applets[4].name, "date");
+    applets[4].main = date_main;
+    strcpy(applets[5].name, "echo");
+    applets[5].main = echo_main;
+    strcpy(applets[6].name, "exit");
+    applets[6].main = exit_main;
+    strcpy(applets[7].name, "help");
+    applets[7].main = help_main;
     strcpy(applets[8].name, "history");
     applets[8].main = history_main;
-    strcpy(applets[9].name, "date");
-    applets[9].main = date_main;
+    strcpy(applets[9].name, "ls");
+    applets[9].main = ls_main;
+    strcpy(applets[10].name, "rand");
+    applets[10].main = rand_main;
 
-    memset(&applets[10], 0, sizeof(Applet));
+    memset(&applets[11], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr
@@ -157,6 +160,6 @@ void cpshell_init() {
     }
 
     // welcome
-	char welcomeMessage[] = "Welcome to CPShell!\nRunning on Classpad OS v2.1.2\nWritten by: CPShell Team\nType 'help' for a list of commands.\n\n\n";
+	char welcomeMessage[] = "Welcome to CPShell (Running OS v2.1.2)\nWritten by: Sean McGinty (s3ansh33p)\nType 'help' for a list of commands.\n\n";
 	terminal->WriteChars(welcomeMessage);
 }

@@ -9,7 +9,7 @@ class VirtualKeyboard {
 		void ToggleShift();
         bool caps = false;
 		int16_t x = 8;
-		int16_t y = 466;
+		int16_t y = 482;
 		int16_t xmargin = 10;
 		int16_t ymargin = 10;
 		uint8_t* font;

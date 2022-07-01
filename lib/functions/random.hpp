@@ -21,3 +21,5 @@ uint32_t RandomGenerator::Generate(uint32_t max = 100) {
     this->m_x = (this->m_mul * this->m_x + this->m_add) % max;
     return this->m_x;
 }
+
+RandomGenerator* rng;
