@@ -36,6 +36,25 @@ class RTC {
             return regRead(RYRCNT);
         }
 
+        void setSeconds(uint8_t seconds) {
+            setAny(RSECCNT, seconds);
+        }
+        void setMinutes(uint8_t minutes) {
+            setAny(RMINCNT, minutes);
+        }
+        void setHours(uint8_t hours) {
+            setAny(RHRCNT, hours);
+        }
+        void setDay(uint8_t day) {
+            setAny(RDAYCNT, day);
+        }
+        void setMonth(uint8_t month) {
+            setAny(RMONCNT, month);
+        }
+        void setYear(uint16_t year) {
+            setAny(RYRCNT, year);
+        }
+
         // up to 6 arguments are supported
         void setDate(uint8_t seconds){setDate(seconds, getMinutes(), getHours(), getDay(), getMonth(), getYear());}
         void setDate(uint8_t seconds, uint8_t minutes){setDate(seconds, minutes, getHours(), getDay(), getMonth(), getYear());}
@@ -91,9 +110,20 @@ class RTC {
             *regAddress(reg) = value;
         }
 
+        inline void setAny(Registers8 reg, uint8_t value) {
+            regClearBit(RTC_START);
+            regWrite(reg, value);
+            regSetBit(RTC_START);
+        }
+        inline void setAny(Registers16 reg, uint16_t value) {
+            regClearBit(RTC_START);
+            regWrite(reg, value);
+            regSetBit(RTC_START);
+        }
+
         enum RCR2_BITS{
             RTC_START	= 0b00000001, //enable to start, stop to change time
-            RTC_RESET	= 0b00000010, //reset divider cirquit
+            RTC_RESET	= 0b00000010, //reset divider circuit
             RTC_ROUND	= 0b00000100, //30second adjust
             RTC_HALT	= 0b00001000, //halt crystal oscillator
             RTC_INT0	= 0b00010000, //Timer Interrupt settings

@@ -206,8 +206,8 @@ void main2() {
 	Terminal terminalp;
 	terminal = &terminalp;
 	terminal->SetFont(f_7x8);
-	Debug_Printf(10,29,true,0,"Max X: %i", terminal->xmax);
-	Debug_Printf(10,30,true,0,"W x H: %i x %i", terminal->termWidth, terminal->termHeight);
+	// Debug_Printf(10,29,true,0,"Max X: %i", terminal->xmax);
+	// Debug_Printf(10,30,true,0,"W x H: %i x %i", terminal->termWidth, terminal->termHeight);
 
 
 	// Add event listeners
@@ -251,8 +251,8 @@ void main2() {
 
 		checkEvents();
 		
-		Debug_Printf(10,31,true,0,"RNG: %i",rng->m_x);
-		Debug_Printf(10,28,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
+		// Debug_Printf(10,31,true,0,"RNG: %i",rng->m_x);
+		// Debug_Printf(10,28,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
 
 		LCD_Refresh();
 	}

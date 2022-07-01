@@ -8,8 +8,8 @@ class VirtualKeyboard {
 		void Highlight(uint8_t x, uint8_t y, uint32_t highlightColor = color(255,255,0), bool hide = false);
 		void ToggleShift();
         bool caps = false;
-		int16_t x = 12;
-		int16_t y = 400;
+		int16_t x = 8;
+		int16_t y = 466;
 		int16_t xmargin = 10;
 		int16_t ymargin = 10;
 		uint8_t* font;

@@ -29,8 +29,8 @@ class Terminal {
 		// buffer cursor position
 		int16_t bufferCX = 0;
 		int16_t bufferCY = 0;
-		int16_t bufferOffsetX = 8;
-		int16_t bufferOffsetY = 8;
+		int16_t bufferOffsetX = 2;
+		int16_t bufferOffsetY = 2;
 		int16_t xmargin = 8; // character width
 		int16_t ymargin = 9; // character height
 		uint8_t* font;
