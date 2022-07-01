@@ -3,6 +3,8 @@
 
 A shell for the Classpad
 
+
+
 ## Installation
 
 Firstly, clone the project
@@ -39,6 +41,8 @@ First, copy the fonts from `./res/CPShell/fnt` to `/usr/fonts/` on the classpad.
 If there are existing files for `5x6` and `7x8` on the classpad, you will not need to copy those.
 
 Secondly, copy the `./CPShell.hhk` to `/bin/CPShell.hhk` on the classpad.
+
+
 
 ## Classpad Structure
 
@@ -81,9 +85,90 @@ Note that the classpad only supports folders that are 3 levels deep
 
 As a result, I have modified the hollyhock launcher itself so .hhk and .bin files are loaded from the `fls0/bin` directory, though if a user wishes to leave them in the root directory, they can.
 
+## Progress
+
+|  |  |
+|--|--|
+| Overall | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/30"> |
+| User Interface | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/50"> |
+| Commands | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/45"> |
+| System Files | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/20"> |
+| Communication over Serial | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/0"> |
+
+
+
+### User Interface
+
+- [✓] Layout
+- [✓] Virtual Keyboard
+- [✗] Touchscreen Support
+- [✗] Scrollbar
+
+
+
+### Commands
+
+#### `Files`
+- [✓] cat - Display contents of a file
+- [✓] cd - Changes directory (cd .. to go up a level) and support absolute paths
+- [✗] cp - Copy a file
+- [✓] ls - List files in a directory
+- [✗] mkdir - Make a directory
+- [✗] mv - Move a file
+- [✗] rm - Remove a file
+- [✗] rmdir - Remove a directory
+- [✗] touch - Create an empty file with the given name
+
+#### `Terminal Utilities`
+- [✓] clear - Clear the terminal
+- [✓] echo - Display the text given to it
+- [✓] exit - Exit the shell
+- [✓] help - Display help information
+- [✓] history - Read the history file (/usr/.bash_history)
+
+#### `System Utilities`
+- [✓] date - Show the current date and time and can edit it
+- [✗] reboot - Send a signal to the system to reboot
+- [✗] shutdown - Send a signal to the system to shut down.
+- [✗] uptime - Show the time since the system was booted
+
+#### `Classpad Utilities`
+- [✗] xcp-encode - Encode a text file into a classpad file
+- [✗] xcp-decode - Decode a classpad file into a text file
+
+#### `Miscelaneous`
+- [✓] credits - Show the credits
+- [✗] osname - Change the name of the OS (0x808FCC10)
+- [✗] username - Change the username showed on end screen
+
+
+
+### System Files
+- [✓] /usr/.bash_history - History of commands entered into the shell
+- [✗] /usr/.bash_profile - Profile file for the shell
+- [✗] /usr/.hushlogin - Skip the motd on login
+- [✗] /etc/motd - Message of the Day (motd) / Welcome message
+- [✗] /etc/os-release - OS release information
+
+
+
+### Communication over Serial
+
+- [✗] Serial Communication
+
+
+
+## Notes
+
+Todo: Attached listener to [-] Key for easier arguments which writes '-' to terminal buffer.
+
+
+
 ## License
 
 This project is under [GPL-3](https://choosealicense.com/licenses/gpl-3.0/)
+
+
 
 ## Contributors
 
@@ -92,3 +177,4 @@ This project is under [GPL-3](https://choosealicense.com/licenses/gpl-3.0/)
 - [@diddyholz](https://www.github.com/diddyholz)
 - [@Interchan](https://www.github.com/InterChan374)
 - [@Pho3](https://www.github.com/TheRainbowPhoenix)
+
