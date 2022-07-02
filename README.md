@@ -92,7 +92,7 @@ As a result, I have modified the hollyhock launcher itself so .hhk and .bin file
 | Overall | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/30"> |
 | User Interface | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/50"> |
 | Commands | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/45"> |
-| System Files | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/20"> |
+| System Files | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/40"> |
 | Communication over Serial | <img height="14" src="https://us-central1-progress-markdown.cloudfunctions.net/progress/0"> |
 
 
@@ -124,7 +124,7 @@ As a result, I have modified the hollyhock launcher itself so .hhk and .bin file
 - [✓] echo - Display the text given to it
 - [✓] exit - Exit the shell
 - [✓] help - Display help information
-- [✓] history - Read the history file (/usr/.bash_history)
+- [✓] history - Read the history file (/usr/.history)
 
 #### `System Utilities`
 - [✓] date - Show the current date and time and can edit it
@@ -144,8 +144,8 @@ As a result, I have modified the hollyhock launcher itself so .hhk and .bin file
 
 
 ### System Files
-- [✓] /usr/.bash_history - History of commands entered into the shell
-- [✗] /usr/.bash_profile - Profile file for the shell
+- [✓] /usr/.history - History of commands entered into the shell
+- [✓] /usr/.profile - Profile file for the shell
 - [✗] /usr/.hushlogin - Skip the motd on login
 - [✗] /etc/motd - Message of the Day (motd) / Welcome message
 - [✗] /etc/os-release - OS release information

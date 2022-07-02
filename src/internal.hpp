@@ -36,8 +36,11 @@ char g_path[PATH_LEN];
 wchar_t g_wpath[PATH_LEN];
 char g_home[PATH_LEN] = "\\fls0\\"; // default home for now
 
-wchar_t g_whistory[32] = L"\\fls0\\usr\\.bash_history";
-char g_history[32] = "\\fls0\\usr\\.bash_history";
+wchar_t g_whistory[32] = L"\\fls0\\usr\\.history";
+char g_history[32] = "\\fls0\\usr\\.history";
+
+wchar_t g_wuserprofile[32] = L"\\fls0\\usr\\.profile";
+char g_userprofile[32] = "\\fls0\\usr\\.profile";
 
 struct Applet {
 	char name[APPLET_SIZE];

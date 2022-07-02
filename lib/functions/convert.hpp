@@ -50,3 +50,21 @@ char *yearToString(unsigned char src) {
     str[4] = '\0';
     return str;
 }
+
+// for reading user profile, so "0xFF11" is 65297
+uint32_t hexStringToInt(char *str) {
+    uint32_t num = 0;
+    int i = 0;
+    if(str[0] == '0' && str[1] == 'x') i = 2;
+    while (str[i] && (str[i] >= '0' && str[i] <= '9' || str[i] >= 'a' && str[i] <= 'f' || str[i] >= 'A' && str[i] <= 'F')){
+        if(str[i] >= '0' && str[i] <= '9'){
+            num = num * 16 + (str[i] - '0');
+        } else if(str[i] >= 'a' && str[i] <= 'f'){
+            num = num * 16 + (str[i] - 'a' + 10);
+        } else if(str[i] >= 'A' && str[i] <= 'F'){
+            num = num * 16 + (str[i] - 'A' + 10);
+        }
+        i++;
+    }
+    return num;
+}

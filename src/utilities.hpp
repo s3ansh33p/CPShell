@@ -6,8 +6,20 @@
  * @date 2022-06-27
  */
 
+#pragma once
+
 #include "internal.hpp"
 #include <sdk/os/file.hpp>
+
+// String comparison
+int comparePartial(const char *str1, const char *str2, int start) {
+    for (int i = start; i < start + strlen(str2); i++) {
+        if (str1[i] != str2[i - start]) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 // "Safe" file operations
 int safe_internal(int ret, char *msg) {

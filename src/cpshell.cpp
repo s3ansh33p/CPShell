@@ -3,6 +3,8 @@
 #include "../lib/functions/convert.hpp"
 #include "internal.hpp"
 #include "utilities.hpp" // history
+#include "loader.hpp" // user profile
+
 
 // commands
 #include "commands/cat.cpp"
@@ -34,6 +36,9 @@ void display_host() {
     terminal->WriteBuffer('$', false);
     // add space
     terminal->WriteBuffer(' ', false);
+
+    // set color to TERM_COLOR
+    terminal->SetColor(TERM_COLOR);
     
     // reset bufferPosition
     terminal->bufferInPos = 0;
@@ -158,6 +163,16 @@ void cpshell_init() {
         g_wpath[i++]='*'; //add an *
         g_wpath[i  ]= 0 ; //add the 0
     }
+
+    // call load_userprofile
+    int profileLoad = load_userprofile();
+    if (profileLoad != 0) {
+        char err_msg[BUF_SIZE];
+        strcpy(err_msg, "Error loading user profile.\n");
+        terminal->WriteChars(err_msg);
+    }
+    LCD_Refresh();
+    terminal->ClearBuffer();
 
     // welcome
 	char welcomeMessage[] = "Welcome to CPShell (Running OS v2.1.2)\nWritten by: Sean McGinty (s3ansh33p)\nType 'help' for a list of commands.\n\n";
