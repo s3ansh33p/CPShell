@@ -68,3 +68,28 @@ uint32_t hexStringToInt(char *str) {
     }
     return num;
 }
+
+// ascii to hex
+char *asciiToHex(char *str) {
+    char *hex = (char *)malloc(sizeof(char) * (strlen(str) * 2 + 1));
+    int i = 0;
+    while (str[i]) {
+        hex[i * 2] = str[i] / 16 + '0';
+        hex[i * 2 + 1] = str[i] % 16 + '0';
+        i++;
+    }
+    hex[i * 2] = '\0';
+    return hex;
+}
+
+// hex to ascii
+char *hexToAscii(char *str) {
+    char *ascii = (char *)malloc(sizeof(char) * (strlen(str) / 2 + 1));
+    int i = 0;
+    while (str[i * 2] && str[i * 2 + 1]) {
+        ascii[i] = (str[i * 2] - '0') * 16 + (str[i * 2 + 1] - '0');
+        i++;
+    }
+    ascii[i] = '\0';
+    return ascii;
+}

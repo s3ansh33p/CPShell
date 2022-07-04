@@ -47,7 +47,7 @@ struct Applet {
 	int (*main)(int argc, char** argv);
 };
 
-static struct Applet applets[12]; // length is num funcs + 1 for empty
+static struct Applet applets[14]; // length is num funcs + 1 for empty
 
 extern int cpshell_main(int argc, char** argv);
 
