@@ -11,6 +11,26 @@
 #include "internal.hpp"
 #include <sdk/os/file.hpp>
 
+// Get the username from memory address 0x8C1BE984
+char *getUsername()
+{
+    char *userName = (char *)0x8C1BE984;
+    // get username until null byte or length is 88
+    int i = 0;
+    while (userName[i] != '\0' && i < 88) {
+        i++;
+    }
+    // allocate memory for username
+    char *user = (char *)malloc(i + 1);
+    // copy username into memory
+    for (int j = 0; j < i; j++) {
+        user[j] = userName[j];
+    }
+    // null terminate string
+    user[i] = '\0';
+    return user;
+}
+
 // String comparison
 int comparePartial(const char *str1, const char *str2, int start) {
     for (int i = start; i < start + strlen(str2); i++) {
