@@ -17,7 +17,9 @@
 #include "commands/help.cpp"
 #include "commands/history.cpp"
 #include "commands/ls.cpp"
+#include "commands/osname.cpp"
 #include "commands/rand.cpp"
+#include "commands/username.cpp"
 
 static int been_there_done_that = 0;
 
@@ -138,10 +140,14 @@ void cpshell_init() {
     applets[8].main = history_main;
     strcpy(applets[9].name, "ls");
     applets[9].main = ls_main;
-    strcpy(applets[10].name, "rand");
-    applets[10].main = rand_main;
+    strcpy(applets[10].name, "osname");
+    applets[10].main = osname_main;
+    strcpy(applets[11].name, "rand");
+    applets[11].main = rand_main;
+    strcpy(applets[12].name, "username");
+    applets[12].main = username_main;
 
-    memset(&applets[11], 0, sizeof(Applet));
+    memset(&applets[13], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr
