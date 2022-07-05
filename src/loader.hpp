@@ -16,6 +16,7 @@
 // Terminal - Defaults here
 uint32_t TERM_COLOR = 0xFFFF;
 uint32_t TERM_CURSOR = 0xFFFF;
+bool     HISTORY_ENABLED = true;
 
 void load_settings() {
     terminal->SetColor(TERM_COLOR);
@@ -133,6 +134,38 @@ int load_userprofile() {
                         } else {
                             // invalid keyword
                             strcpy(outBuf, "LOAD: Invalid TERM_ keyword on line ");
+                            strcat(outBuf, numToString(lineNum));
+                            strcat(outBuf, "\n");
+                            terminal->WriteChars(outBuf);
+                        }
+                    } else if (comparePartial(line, "HISTORY_", 0)) {
+                        // check if keyword is 'HISTORY_ENABLED'
+                        if (comparePartial(line, "ENABLED", 8)) {
+                            // ensure that after '=' is ON or OFF
+                            if (lineLength == 18 || lineLength == 19) {
+                                if (comparePartial(line, "ON", 16)) {
+                                    // enable history
+                                    strcpy(outBuf, "LOAD: HISTORY_ENABLED set to ON\n");
+                                    terminal->WriteChars(outBuf);
+                                    HISTORY_ENABLED = true;
+                                } else if (comparePartial(line, "OFF", 16)) {
+                                    // disable history
+                                    strcpy(outBuf, "LOAD: HISTORY_ENABLED set to OFF\n");
+                                    terminal->WriteChars(outBuf);
+                                    HISTORY_ENABLED = false;
+                                } else {
+                                    // invalid value
+                                    strcpy(outBuf, "LOAD: Invalid HISTORY_ENABLED value\n");
+                                    terminal->WriteChars(outBuf);
+                                }
+                            } else {
+                                // invalid length
+                                strcpy(outBuf, "LOAD: Invalid HISTORY_ENABLED length\n");
+                                terminal->WriteChars(outBuf);
+                            }
+                        } else {
+                            // invalid keyword
+                            strcpy(outBuf, "LOAD: Invalid HISTORY_ keyword on line ");
                             strcat(outBuf, numToString(lineNum));
                             strcat(outBuf, "\n");
                             terminal->WriteChars(outBuf);

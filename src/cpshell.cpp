@@ -57,12 +57,14 @@ int psuedo_main(int argc, char **argv)
 	    name = s;
     }
 
-    int hist_status;
-    hist_status = add_history(argc, argv);
-    if (hist_status != 0) {
-        char err_msg[BUF_SIZE];
-        strcpy(err_msg, "Error adding to history.\n");
-        terminal->WriteChars(err_msg);
+    if (HISTORY_ENABLED) {
+        int hist_status;
+        hist_status = add_history(argc, argv);
+        if (hist_status != 0) {
+            char err_msg[BUF_SIZE];
+            strcpy(err_msg, "Error adding to history.\n");
+            terminal->WriteChars(err_msg);
+        }
     }
 
     while (a->name[0] != 0) {
