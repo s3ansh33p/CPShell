@@ -5,6 +5,7 @@
 #include "lib/draw_functions.hpp"
 #include "lib/core/exceptions.hpp"
 #include "lib/core/event_handler.hpp"
+#include "lib/core/touch_event_handler.hpp"
 #include "lib/functions/random.hpp"
 
 // shell
@@ -182,6 +183,39 @@ void kbEnter() {
 	}
 }
 
+void HandleTouchForKeyboard() {
+	keyboard->Highlight(keyboard->xcursor, keyboard->ycursor, keyboard->keyColor, true);
+	uint16_t xIn = event.data.touch_single.p1_x;
+	uint16_t yIn = event.data.touch_single.p1_y;
+	Debug_Printf(1,34,true,0,"%d | %d",xIn,yIn);
+	// get x and y to be top left of keyboard
+	xIn -= keyboard->x;
+	yIn -= keyboard->y;
+	// read column / row
+	uint16_t xOffset = xIn / keyboard->xmargin;
+	uint16_t yOffset = yIn / keyboard->ymargin;
+	// to investigate later
+	if (yOffset > 3) yOffset = 3;
+	// check if on bottom line
+	if (yOffset > 2) {
+		if (xIn < keyboard->xmargin * 7) {
+			xOffset = 0;
+		} else if (xIn < keyboard->xmargin * 14) {
+			xOffset = 1;
+		} else {
+			xOffset = 2;
+		}
+	}
+	keyboard->xcursor = xOffset;
+	keyboard->ycursor = yOffset;
+	keyboard->Highlight(xOffset, yOffset);
+	kbEnter();
+}
+
+void testTouch() {
+	Debug_Printf(10,32,true,0,"Working");
+}
+
 //The acutal main
 void main2() {
 
@@ -219,6 +253,10 @@ void main2() {
 	addListener2(KEY_DOWN, kbDown); // down cursor
 	addListener(KEY_EXE, kbEnter); // send the key
 
+	addTouchListener(0, 0, 300, 100, testTouch); // touch listener
+	addTouchListener(keyboard->x, keyboard->y, keyboard->x + keyboard->xmargin * 22 - 1, keyboard->y + keyboard->ymargin * 4 - 1, HandleTouchForKeyboard);
+
+
 	// Initialize the shell
 	cpshell_init();
 	// Display Host
@@ -236,7 +274,7 @@ void main2() {
 		frameCounter++;
 
 		// update the cursor
-		if (frameCounter > 10) {
+		if (frameCounter > 8) {
 			frameCounter = 0;
 			isCursorShowing = !isCursorShowing;
 			if (isCursorShowing) {
@@ -247,7 +285,7 @@ void main2() {
 		}
 
 		checkEvents();
-		
+		checkTouchEvents();
 		// Debug_Printf(10,28,true,0,"T X: %i | Y: %i | PX: %i | PY: %i",terminal->bufferCX, terminal->bufferCY, terminal->bufferCX * terminal->xmargin + terminal->bufferOffsetX, terminal->bufferCY * terminal->ymargin + terminal->bufferOffsetY);
 
 		LCD_Refresh();
