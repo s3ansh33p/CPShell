@@ -16,11 +16,15 @@
 // Terminal - Defaults here
 uint32_t TERM_COLOR = 0xFFFF;
 uint32_t TERM_CURSOR = 0xFFFF;
+uint32_t SCROLL_COLOR = 0x6B6D;
+uint32_t SCROLL_HANDLE = 0x8C71;
 bool     HISTORY_ENABLED = true;
 
 void load_settings() {
     terminal->SetColor(TERM_COLOR);
     terminal->SetCursorColor(TERM_CURSOR);
+    scrollbar->SetColors(SCROLL_COLOR, SCROLL_HANDLE);
+    scrollbar->Render();
 }
 
 int load_userprofile() {
@@ -166,6 +170,40 @@ int load_userprofile() {
                         } else {
                             // invalid keyword
                             strcpy(outBuf, "LOAD: Invalid HISTORY_ keyword on line ");
+                            strcat(outBuf, numToString(lineNum));
+                            strcat(outBuf, "\n");
+                            terminal->WriteChars(outBuf);
+                        }
+                    } else if (comparePartial(line, "SCROLL_", 0)) {
+                        if (comparePartial(line, "COLOR", 6)) {
+                            // ensure that length after '=' is 4 or 6
+                            if (lineLength == 16 || lineLength == 18) {
+                                TERM_COLOR = hexStringToInt(line + 12);
+                                strcpy(outBuf, "LOAD: SCROLL_COLOR set to ");
+                                strcat(outBuf, line + 12);
+                                strcat(outBuf, "\n");
+                                terminal->WriteChars(outBuf);
+                            } else {
+                                // invalid length
+                                strcpy(outBuf, "LOAD: Invalid SCROLL_COLOR length\n");
+                                terminal->WriteChars(outBuf);
+                            }
+                        } else if (comparePartial(line, "HANDLE", 6)) {
+                            // ensure that length after '=' is 4 or 6
+                            if (lineLength == 16 || lineLength == 18) {
+                                TERM_CURSOR = hexStringToInt(line + 12);
+                                strcpy(outBuf, "LOAD: SCROLL_HANDLE set to ");
+                                strcat(outBuf, line + 12);
+                                strcat(outBuf, "\n");
+                                terminal->WriteChars(outBuf);
+                            } else {
+                                // invalid length
+                                strcpy(outBuf, "LOAD: Invalid SCROLL_HANDLE length\n");
+                                terminal->WriteChars(outBuf);
+                            }
+                        } else {
+                            // invalid keyword
+                            strcpy(outBuf, "LOAD: Invalid SCROLL_ keyword on line ");
                             strcat(outBuf, numToString(lineNum));
                             strcat(outBuf, "\n");
                             terminal->WriteChars(outBuf);

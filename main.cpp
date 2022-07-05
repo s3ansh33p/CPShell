@@ -10,14 +10,18 @@
 
 // shell
 #include "src/internal.hpp" // definitions
+#include "src/scrollbar.hpp"
 #include "src/terminal.hpp"
 #include "src/virtual_keyboard.hpp"
 
+// Scollbar pointer
+Scrollbar *scrollbar;
+
 // Terminal pointer
-Terminal* terminal;
+Terminal *terminal;
 
 // Virtual Keyboard pointer
-VirtualKeyboard* keyboard;
+VirtualKeyboard *keyboard;
 
 #include "src/cpshell.cpp"
 
@@ -187,7 +191,6 @@ void HandleTouchForKeyboard() {
 	keyboard->Highlight(keyboard->xcursor, keyboard->ycursor, keyboard->keyColor, true);
 	uint16_t xIn = event.data.touch_single.p1_x;
 	uint16_t yIn = event.data.touch_single.p1_y;
-	Debug_Printf(1,34,true,0,"%d | %d",xIn,yIn);
 	// get x and y to be top left of keyboard
 	xIn -= keyboard->x;
 	yIn -= keyboard->y;
@@ -212,9 +215,44 @@ void HandleTouchForKeyboard() {
 	kbEnter();
 }
 
-void testTouch() {
-	Debug_Printf(10,32,true,0,"Working");
+void HandleTouchForScrollbar() {
+	// get distance from top of scroll handle
+	uint16_t touchPos = event.data.touch_single.p1_y;
+	uint16_t scrollPos = scrollbar->position;
+	uint16_t scrollOffset = scrollPos - touchPos + scrollbar->size;
+
+	if (scrollOffset > scrollbar->size) {
+		return;
+	}
+
+	Debug_Printf(1,34,true,0,"%d | %d",event.data.touch_single.p1_x,event.data.touch_single.p1_y);
+
+	if (event.data.touch_single.direction == TOUCH_DOWN) {
+
+		scrollbar->prevScrollOffset = scrollOffset;
+
+	} else if (event.data.touch_single.direction == TOUCH_HOLD_DRAG || event.data.touch_single.direction == TOUCH_UP) {
+
+		// Render hidden scrollbar to remove ghosting
+		scrollbar->handleColor = 0;
+		scrollbar->Render();
+
+		uint16_t prevScrollOffset = scrollbar->prevScrollOffset;
+		uint16_t scrollDiff = scrollOffset - prevScrollOffset;
+		uint16_t newScrollPos = scrollPos - scrollDiff;
+		scrollbar->SetPosition(newScrollPos);
+
+		// Render visible scrollbar
+		scrollbar->handleColor = SCROLL_HANDLE;
+		scrollbar->Render();
+
+	}
+
 }
+
+// void testTouch() {
+// 	Debug_Printf(10,32,true,0,"Working");
+// }
 
 //The acutal main
 void main2() {
@@ -240,6 +278,8 @@ void main2() {
 	// Debug_Printf(10,29,true,0,"Max X: %i", terminal->xmax);
 	// Debug_Printf(10,30,true,0,"W x H: %i x %i", terminal->termWidth, terminal->termHeight);
 
+	Scrollbar scrollbarp;
+	scrollbar = &scrollbarp;
 
 	// Add event listeners
 	addListener(KEY_CLEAR, endShell); // end the shell - cmd now
@@ -253,8 +293,10 @@ void main2() {
 	addListener2(KEY_DOWN, kbDown); // down cursor
 	addListener(KEY_EXE, kbEnter); // send the key
 
-	addTouchListener(0, 0, 300, 100, testTouch); // touch listener
+	addTouchListener(scrollbar->x, scrollbar->y, scrollbar->x + scrollbar->w, scrollbar->h, HandleTouchForScrollbar, 0); // touch listener
 	addTouchListener(keyboard->x, keyboard->y, keyboard->x + keyboard->xmargin * 22 - 1, keyboard->y + keyboard->ymargin * 4 - 1, HandleTouchForKeyboard);
+
+	// addTouchListener(width - 101, 0, width - 1, height - 1, testTouch, 0);
 
 
 	// Initialize the shell

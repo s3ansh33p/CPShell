@@ -63,7 +63,7 @@ void checkTouchEvents() {
                if (event.data.touch_single.p1_x >= touchHandlers[i].minX && event.data.touch_single.p1_x <= touchHandlers[i].maxX &&
                   event.data.touch_single.p1_y >= touchHandlers[i].minY && event.data.touch_single.p1_y <= touchHandlers[i].maxY) {
                   // check direction
-                  if (event.data.touch_single.direction == touchHandlers[i].direction) {
+                  if (event.data.touch_single.direction == touchHandlers[i].direction || touchHandlers[i].direction == 0) {
                      (*touchHandlers[i].callback)();
                      break;
                   }
