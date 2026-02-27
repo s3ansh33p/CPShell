@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file date.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)

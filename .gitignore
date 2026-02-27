@@ -1,10 +1,5 @@
-# Ignore make files
-start.o
-main.o
-calc.o
-div.o
-_hhkengine.elf
-# hhkengine.hhk
-
-# Ignore workplace files
-settings.json
+dist/
+obj/
+.cache/
+.deps/
+compile_commands.jsontemp_hhk3_sdk/

@@ -1,0 +1,16 @@
+CompileFlags:
+  Add:
+    - -Wall
+    - -Wextra
+    - -Werror
+  Remove:
+    - -m*
+    - -fstrict-volatile-bitfields
+
+Style:
+  FullyQualifiedNamespaces:
+    - "*"
+
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: Loose

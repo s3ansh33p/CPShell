@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <sdk/calc/calc.hpp>
+#include <sdk/calc/calc.h>
 #include "trig_functions.hpp"
 
 #define TRANSPARENCY_COLOR 0xF81F // (255, 0, 255) or #FF00FF

@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file help.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
@@ -8,7 +10,7 @@
 
 #include "../internal.hpp"
 
-extern int help_main(int argc, char **argv)
+extern int help_main(int, char **)
 {
     struct Applet *a = applets;
     terminal->ClearBuffer();
@@ -21,11 +23,6 @@ extern int help_main(int argc, char **argv)
     char cmds[APPLET_SIZE];
     while (a->name[0] != 0) {
         strcpy(cmds, (a++)->name);
-        // check if terminal->bufferCX is at the end of the line + 2 for ', '
-        if ((terminal->bufferCX + strlen(a->name) + 2) >= terminal->xmax) {
-            terminal->WriteBuffer('\n', false);
-            terminal->ClearBuffer();
-        }
         strcat(cmds, ", ");
         terminal->WriteChars(cmds, true);
     }

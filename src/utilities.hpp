@@ -9,7 +9,7 @@
 #pragma once
 
 #include "internal.hpp"
-#include <sdk/os/file.hpp>
+#include <sdk/os/file.h>
 
 // Get the username from memory address 0x8C1BE984
 char *getUsername()
@@ -33,7 +33,7 @@ char *getUsername()
 
 // String comparison
 int comparePartial(const char *str1, const char *str2, int start) {
-    for (int i = start; i < start + strlen(str2); i++) {
+    for (int i = start; i < start + (int)strlen(str2); i++) {
         if (str1[i] != str2[i - start]) {
             return 0;
         }
@@ -42,37 +42,37 @@ int comparePartial(const char *str1, const char *str2, int start) {
 }
 
 // "Safe" file operations
-int safe_internal(int ret, char *msg) {
+int safe_internal(int ret, const char *msg) {
     if (ret < 0) {
         terminal->WriteChars(msg);
-        close(ret);
+        File_Close(ret);
         return -1;
     }
     return ret;
 }
 
 int safe_read(int fd, char *buf, int len) {
-    int ret = read(fd, buf, len);
+    int ret = File_Read(fd, buf, len);
     return safe_internal(ret, "An error occurred calling read.\n");
 }
 
-int safe_write(int fd, char *buf, int len) {
-    int ret = write(fd, buf, len);
+int safe_write(int fd, const char *buf, int len) {
+    int ret = File_Write(fd, buf, len);
     return safe_internal(ret, "An error occurred calling write.\n");
 }
 
-int safe_open(char *path, int flags) {
-    int ret = open(path, flags);
+int safe_open(const char *path, int flags) {
+    int ret = File_Open(path, flags);
     return safe_internal(ret, "An error occurred calling open.\n");
 }
 
 int safe_close(int fd) {
-    int ret = close(fd);
+    int ret = File_Close(fd);
     return safe_internal(ret, "An error occurred calling close.\n");
 }
 
 int safe_lseek(int fd, int offset, int whence) {
-    int ret = lseek(fd, offset, whence);
+    int ret = File_Lseek(fd, offset, (File_Whence)whence);
     return safe_internal(ret, "An error occurred calling lseek.\n");
 }
 
@@ -83,40 +83,40 @@ int add_history(int argc, char **argv) {
 
     // check if history file exists
     int findHandle;
-    wchar_t fileName[100];
-    struct findInfo findInfoBuf;
-    int ret = findFirst(g_whistory, &findHandle, fileName, &findInfoBuf);
+    char_const16_t fileName[100];
+    struct File_FindInfo findInfoBuf;
+    int ret = File_FindFirst((const char_const16_t*)(const char_const16_t*)g_whistory, &findHandle, fileName, &findInfoBuf);
     if (ret < 0) {
         // history file does not exist
         // create the file
-        int fd = open(g_history, OPEN_WRITE | OPEN_CREATE);
+        int fd = File_Open(g_history, FILE_OPEN_WRITE | FILE_OPEN_CREATE);
         if (fd < 0) {
             // failed to create file
             strcpy(outBuf, "Failed to create history file.\n");
             terminal->WriteChars(outBuf);
-            close(fd);
-            findClose(findHandle);
+            File_Close(fd);
+            File_FindClose(findHandle);
             return -1;
         }
         // close the file
         safe_close(fd);
 
     // history file exists, check if it is a directory
-    } else if (findInfoBuf.type == findInfoBuf.EntryTypeDirectory) {
+    } else if (findInfoBuf.type == File_FindInfo::EntryTypeDirectory) {
         // history file is a directory
         strcpy(outBuf, "History file is a directory.\n");
         terminal->WriteChars(outBuf);
-        findClose(findHandle);
+        File_FindClose(findHandle);
         return -1;
     }
 
-    findClose(findHandle);
+    File_FindClose(findHandle);
 
     // history file exists, add to it
-    int fd = safe_open(g_history, OPEN_WRITE);
+    int fd = safe_open(g_history, FILE_OPEN_WRITE);
 
     // write to the end of the file
-    safe_lseek(fd, 0, SEEK_END);
+    safe_lseek(fd, 0, FILE_SEEK_END);
 
     // write to file
     for (int i = 0; i < argc; i++) {

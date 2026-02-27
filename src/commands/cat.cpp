@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file cat.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
@@ -7,7 +9,7 @@
  */
 
 #include "../internal.hpp"
-#include <sdk/os/file.hpp>
+#include <sdk/os/file.h>
 
 extern int cat_main(int argc, char **argv)
 {
@@ -28,42 +30,42 @@ extern int cat_main(int argc, char **argv)
     if (argv[1][0] != '\\') strcpy(path, g_path);
     strcat(path, argv[1]);
     // convert to wchar_t
-    wchar_t wpath[PATH_LEN];
+    char_const16_t wpath[PATH_LEN];
     for (int i = 0; i < PATH_LEN; i++) {
         wpath[i] = path[i];
     }
 
     // check if the path exists
     int findHandle;
-    wchar_t fileName[100];
-    struct findInfo findInfoBuf;
-    int ret = findFirst(wpath, &findHandle, fileName, &findInfoBuf);
+    char_const16_t fileName[100];
+    struct File_FindInfo findInfoBuf;
+    int ret = File_FindFirst((const char_const16_t*)wpath, &findHandle, fileName, &findInfoBuf);
     if (ret < 0) {
         // path does not exist
         strcpy(outBuf, "Path does not exist.\n");
         terminal->WriteChars(outBuf);
         
         // close the file
-        findClose(findHandle);
+        File_FindClose(findHandle);
         return 0;
     }
 
     // path exists, check if it is a directory
-    if (findInfoBuf.type == findInfoBuf.EntryTypeDirectory) {
+    if (findInfoBuf.type == File_FindInfo::EntryTypeDirectory) {
         // path is a directory
         strcpy(outBuf, "Path is a directory.\n");
         terminal->WriteChars(outBuf);
         
         // close the file
-        findClose(findHandle);
+        File_FindClose(findHandle);
         return 0;
     }
 
     // close the file
-    findClose(findHandle);
+    File_FindClose(findHandle);
 
     // now that we know the path is a file, open it
-    int fd = open(path, OPEN_READ);
+    int fd = File_Open(path, FILE_OPEN_READ);
     if (fd < 0) {
         // An error occurred calling open
         strcpy(outBuf, "An error occurred calling open.\n");
@@ -73,10 +75,10 @@ extern int cat_main(int argc, char **argv)
 
     // copy memory address
 	uint8_t* addr;
-	getAddr(fd,0,(const void**)&addr);
+	if (File_GetAddr(fd,0,(const void**)&addr) < 0) {}
 
     // close the file
-    ret = close(fd);
+    ret = File_Close(fd);
     if (ret < 0) {
         // An error occurred calling close
         strcpy(outBuf, "An error occurred calling close.\n");

@@ -1,102 +1,86 @@
-APP_NAME:=CPShell
+SOURCEDIR = src
+BUILDDIR = obj
+OUTDIR = dist
+DEPDIR = .deps
 
-#This Makefile compiles a program for the calculator running hollyhock-2 and for the pc. 
-#You need the hollyhock sdk for the calculator version and sdl2 for the pc version.
-# github.com/SnailMath/hollyhock-2 
-#export SDK_DIR:=/path/to/the/folder/hollyhock-2/sdk/
+AS:=sh4a_nofpueb-elf-gcc
+AS_FLAGS:=-gdwarf-5
 
+SDK_DIR?=/sdk
 
-#you can use 'make all' to compile all and 'make clean' to remove the output files.
-#you can compile only the pc version with 'make pc' (you won't need hollyhock)
-#or only the calculator version with 'make hhk' (you won't need sdl for this)
+DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+WARNINGS=-Wall -Wextra -pedantic -Werror -pedantic-errors
+INCLUDES=-I$(SDK_DIR)/include -I.
+DEFINES=
+FUNCTION_FLAGS=-flto=auto -ffat-lto-objects -fno-builtin -ffunction-sections -fdata-sections -gdwarf-5 -O2
+COMMON_FLAGS=$(FUNCTION_FLAGS) $(INCLUDES) $(WARNINGS) $(DEFINES)
 
+CC:=sh4a_nofpueb-elf-gcc
+CC_FLAGS=-std=c23 $(COMMON_FLAGS)
 
-#this makefile is based on the makefile in app_tamplate from the original hollyhock project by The6P4C
+CXX:=sh4a_nofpueb-elf-g++
+CXX_FLAGS=-std=c++20 $(COMMON_FLAGS)
 
+LD:=sh4a_nofpueb-elf-g++
+LD_FLAGS:=$(FUNCTION_FLAGS) -Wl,--gc-sections
+LIBS:=-L$(SDK_DIR) -lsdk
 
-#ifndef SDK_DIR
-#$(error You need to define the SDK_DIR environment variable, and point it to the sdk/ folder)
-#endif
+READELF:=sh4a_nofpueb-elf-readelf
+OBJCOPY:=sh4a_nofpueb-elf-objcopy
+STRIP:=sh4a_nofpueb-elf-strip
 
-#If you use AS sources make sure to write the same functions in C++ because sh4 as does not run on the pc
+APP_ELF := $(OUTDIR)/CPShell.elf
+APP_HH3 := $(APP_ELF:.elf=.hh3)
 
-#The pc compiler
-C_PC:=gcc
-C_PC_FLAGS:=-W -Wall -DPC -lSDL2
-
-#The sh4 assembler, compiler and linker:
-AS:=sh4-elf-as
-AS_FLAGS:=
-
-CC:=sh4-elf-gcc 
-CC_FLAGS:=-ffreestanding -fshort-wchar -Wall -Wextra -O2 -I $(SDK_DIR)/include/ -I $(SDK_DIR)/newlib/sh-elf/include -j8
-
-CXX:=sh4-elf-g++
-CXX_FLAGS:=-ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 -I $(SDK_DIR)/include/ -I $(SDK_DIR)/newlib/sh-elf/include -m4a-nofpu
-
-LD:=sh4-elf-gcc
-LD_FLAGS:=-nostartfiles -m4-nofpu -Wno-undef -L$(SDK_DIR)/newlib/sh-elf/lib
-
-READELF:=sh4-elf-readelf
-OBJCOPY:=sh4-elf-objcopy
-
-AS_SOURCES:=$(wildcard *.s)
+AS_SOURCES:=$(wildcard *.S)
 CC_SOURCES:=$(wildcard *.c)
 CXX_SOURCES:=$(wildcard *.cpp)
-H_INC:=$(wildcard *.h) 
-HPP_INC:=$(wildcard *.hpp)
-OBJECTS:=$(AS_SOURCES:.s=.o) $(CC_SOURCES:.c=.o) $(CXX_SOURCES:.cpp=.o)
+OBJECTS := $(addprefix $(BUILDDIR)/,$(AS_SOURCES:.S=.o)) \
+	$(addprefix $(BUILDDIR)/,$(CC_SOURCES:.c=.o)) \
+	$(addprefix $(BUILDDIR)/,$(CXX_SOURCES:.cpp=.o))
 
-APP_PC:=_$(APP_NAME).elf
+NOLTOOBJS := $(foreach obj, $(OBJECTS), $(if $(findstring /nolto/, $(obj)), $(obj)))
 
-APP_ELF:=$(APP_NAME).hhk
+DEPFILES := $(OBJECTS:$(BUILDDIR)/%.o=$(DEPDIR)/%.d)
 
-APP_BIN:=$(APP_NAME).bin
+hh3: $(APP_HH3) Makefile
+elf: $(APP_ELF) Makefile
 
-all: pc hhk
+all: elf hh3
+.DEFAULT_GOAL := all
+.SECONDARY: # Prevents intermediate files from being deleted
 
-bin: $(APP_BIN) Makefile
-
-pc: $(APP_PC) Makefile
-
-hhk: $(APP_ELF) Makefile
-
+.NOTPARALLEL: clean
 clean:
-	rm -f $(OBJECTS) $(APP_ELF) $(APP_PC) $(APP_BIN)
+	rm -rf $(BUILDDIR) $(OUTDIR) $(DEPDIR)
 
-$(APP_PC):  $(CC_SOURCES) $(CXX_SOURCES) $(H_INC) $(HPP_INC)
-	$(C_PC) $(CC_SOURCES) $(CXX_SOURCES) -o $(APP_PC) $(C_PC_FLAGS)
+%.hh3: %.elf
+	$(STRIP) -o $@ $^
 
-$(APP_ELF): $(OBJECTS) $(SDK_DIR)/sdk.o linker.ld
-	$(LD) -T linker.ld -o $@ $(LD_FLAGS) $(OBJECTS) $(SDK_DIR)/sdk.o
-	$(OBJCOPY) --set-section-flags .hollyhock_name=contents,strings,readonly $(APP_ELF) $(APP_ELF)
-	$(OBJCOPY) --set-section-flags .hollyhock_description=contents,strings,readonly $(APP_ELF) $(APP_ELF)
-	$(OBJCOPY) --set-section-flags .hollyhock_author=contents,strings,readonly $(APP_ELF) $(APP_ELF)
-	$(OBJCOPY) --set-section-flags .hollyhock_version=contents,strings,readonly $(APP_ELF) $(APP_ELF)
+$(APP_ELF): $(OBJECTS)
+	@mkdir -p $(dir $@)
+	$(LD) -Wl,-Map $@.map -o $@ $(LD_FLAGS) $^ $(LIBS)
 
-$(APP_BIN): $(OBJECTS) $(SDK_DIR)/sdk.o linker.bin.ld
-	$(LD) -Wl, --oformat binary -T linker.bin.ld -o $@ $(LD_FLAGS) $(OBJECTS) $(SDK_DIR)/sdk.o
+$(NOLTOOBJS): FUNCTION_FLAGS+=-fno-lto
 
-# We're not actually building sdk.o, just telling the user they need to do it
-# themselves. Just using the target to trigger an error when the file is
-# required but does not exist.
-$(SDK_DIR)/sdk.o:
-	$(error You need to build the SDK before using it. Run make in the SDK directory, and check the README.md in the SDK directory for more information)
+$(BUILDDIR)/%.o: %.S
+	@mkdir -p $(dir $@)
+	$(AS) -c $< -o $@ $(AS_FLAGS)
 
-%.o: %.s
-	$(AS) $< -o $@ $(AS_FLAGS)
+$(BUILDDIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@mkdir -p $(dir $(DEPDIR)/$<)
+	+$(CC) -c $< -o $@ $(CC_FLAGS) $(DEPFLAGS)
 
-%.o: %.c $(H_INC)
-	$(CC) -c $< -o $@ $(CC_FLAGS)
+$(BUILDDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@mkdir -p $(dir $(DEPDIR)/$<)
+	+$(CXX) -c $< -o $@ $(CXX_FLAGS) $(DEPFLAGS)
 
-# Break the build if global constructors are present:
-# Read the sections from the object file (with readelf -S) and look for any
-# called .ctors - if they exist, give the user an error message, delete the
-# object file (so that on subsequent runs of make the build will still fail)
-# and exit with an error code to halt the build.
-%.o: %.cpp $(HPP_INC)
-	$(CXX) -c $< -o $@ $(CXX_FLAGS)
-	@$(READELF) $@ -S | grep ".ctors" > /dev/null && echo "ERROR: Global constructors aren't supported." && rm $@ && exit 1 || exit 0
+compile_commands.json:
+	$(MAKE) $(MAKEFLAGS) clean
+	bear -- sh -c "$(MAKE) $(MAKEFLAGS) --keep-going all || exit 0"
 
-#tell make that 'all' 'clean' 'hhk' and 'pc' are not actually files.
-.PHONY: all clean hhk pc
+.PHONY: elf hh3 all clean compile_commands.json
+
+-include $(DEPFILES)

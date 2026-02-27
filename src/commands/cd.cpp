@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file cd.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
@@ -7,7 +9,7 @@
  */
 
 #include "../internal.hpp"
-#include <sdk/os/file.hpp>
+#include <sdk/os/file.h>
 
 extern int cd_main(int argc, char **argv)
 {
@@ -25,32 +27,32 @@ extern int cd_main(int argc, char **argv)
 
     // check if the path exists
     int findHandle;
-    wchar_t fileName[100];
-    struct findInfo findInfoBuf;
-    int ret = findFirst(g_wpath, &findHandle, fileName, &findInfoBuf);
+    char_const16_t fileName[100];
+    struct File_FindInfo findInfoBuf;
+    int ret = File_FindFirst((const char_const16_t*)g_wpath, &findHandle, fileName, &findInfoBuf);
     if (ret < 0) {
         // path does not exist
         strcpy(outBuf, "Path does not exist.\n");
         terminal->WriteChars(outBuf);
         
         // close the file
-        findClose(findHandle);
+        File_FindClose(findHandle);
         return 0;
     }
 
     // path exists, check if it is a directory
-    if (findInfoBuf.type != findInfoBuf.EntryTypeDirectory) {
+    if (findInfoBuf.type != File_FindInfo::EntryTypeDirectory) {
         // path is not a directory
         strcpy(outBuf, "Path is not a directory.\n");
         terminal->WriteChars(outBuf);
         
         // close the file
-        findClose(findHandle);
+        File_FindClose(findHandle);
         return 0;
     }
 
     // close the file
-    findClose(findHandle);
+    File_FindClose(findHandle);
 
     // check for .. - will need to change this in the future to support ../../.. etc
     if (strcmp(argv[1], "..") == 0) {
@@ -58,7 +60,7 @@ extern int cd_main(int argc, char **argv)
         char parentDir[PATH_LEN];
         // search for the last '\\'
         int lastSlash = -1;
-        for (int i = 0; i < strlen(g_path) - 1; i++) { // len -1 as will always be a slash
+        for (int i = 0; i < (int)strlen(g_path) - 1; i++) { // len -1 as will always be a slash
             if (g_path[i] == '\\') {
                 lastSlash = i;
             }
@@ -89,7 +91,7 @@ extern int cd_main(int argc, char **argv)
 
     //convert from char to wchar
     for(int i=0; g_path[i]!=0; i++){
-        wchar_t ch = g_path[i];
+        char_const16_t ch = g_path[i];
         g_wpath[i] = ch;
     }
 

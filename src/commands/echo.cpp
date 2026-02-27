@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file echo.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)

@@ -1,5 +1,9 @@
-/*
- * Ported from BusyBox main internal header file on 0_32 branch
+/**
+ * @file internal.hpp
+ * @author Sean McGinty (newfolderlocation@gmail.com)
+ * @brief Ported from BusyBox main internal header file on 0_32 branch
+ * @version 1.1
+ * @date 2022-06-09
  */
 
 #ifndef	_INTERNAL_H_
@@ -19,6 +23,12 @@
 
 #define CPS_VERSION     "0.1.0"
 
+// UI Constants
+#define KBD_H 260
+#define TAB_H 30
+#define SCREEN_W width
+#define SCREEN_H height
+
 #define isBlank(ch)     (((ch) == ' ') || ((ch) == '\t'))
 #define isDecimal(ch)   (((ch) >= '0') && ((ch) <= '9'))
 #define isOctal(ch)     (((ch) >= '0') && ((ch) <= '7'))
@@ -26,20 +36,22 @@
 
 // Files
 
+#include <sdk/os/file.h>
+
 struct dirEntry{
 	char fileName[100];
 	char type;
 };
 struct dirEntry directory[64];
 
-char g_path[PATH_LEN];
-wchar_t g_wpath[PATH_LEN];
+char g_path[PATH_LEN] __attribute__((aligned(4)));
+char16_t g_wpath[PATH_LEN] __attribute__((aligned(4)));
 char g_home[PATH_LEN] = "\\fls0\\"; // default home for now
 
-wchar_t g_whistory[32] = L"\\fls0\\usr\\.history";
+char16_t g_whistory[32] __attribute__((aligned(4))) = u"\\fls0\\usr\\.history";
 char g_history[32] = "\\fls0\\usr\\.history";
 
-wchar_t g_wuserprofile[32] = L"\\fls0\\usr\\.profile";
+char16_t g_wuserprofile[32] __attribute__((aligned(4))) = u"\\fls0\\usr\\.profile";
 char g_userprofile[32] = "\\fls0\\usr\\.profile";
 
 struct Applet {

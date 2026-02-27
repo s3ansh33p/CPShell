@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file clear.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
@@ -6,17 +8,14 @@
  * @date 2022-06-06
  */
 
-extern int clear_main(int argc, char **argv)
+extern int clear_main(int, char **)
 {
     // clear the screen to black
     fillScreen(0);
     // rerender the keyboard
     keyboard->Render();
-    // keyboard highlight
-    keyboard->Highlight(keyboard->xcursor, keyboard->ycursor);
     // clear the terminal buffer
     terminal->ClearBuffer();
-    // reset terminal y
-    terminal->bufferCY = 0;
+    terminal->Render();
     return 0;
 };

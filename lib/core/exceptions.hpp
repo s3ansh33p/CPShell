@@ -19,6 +19,6 @@
  * }
  * @endcode
  */
-#define try bool __HadError=false;
-#define catch __ExitJmp:if(__HadError)
-#define throw(x) __HadError=true;goto __ExitJmp;
+#define TRY bool __HadError=false;
+#define CATCH __ExitJmp:if(__HadError)
+#define THROW(x) __HadError=true;goto __ExitJmp;

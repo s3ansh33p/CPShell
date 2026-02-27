@@ -8,7 +8,8 @@
 
 #pragma once
 #include "../../calc.hpp"
-#include <sdk/os/input.hpp>
+#include <sdk/os/input.h>
+#include <sdk/os/mem.h>
 
 struct TouchHandler {
    uint32_t minX;
@@ -24,20 +25,28 @@ struct ActBarHandler {
    void (*callback)();
 };
 
+struct KeyListener {
+    Input_Keycode key;
+    void (*callback)();
+};
+
 // can be changed to accomodate more events if needed
 
 struct TouchHandler touchHandlers[64];
-uint8_t touchHandlersLength = 0;
+uint32_t touchHandlersLength = 0;
 
 struct ActBarHandler actBarHandlers[6];
-uint8_t actBarHandlersLength = 0;
+uint32_t actBarHandlersLength = 0;
 
-struct InputEvent event;
+struct KeyListener keyListeners[32];
+uint32_t keyListenersLength = 0;
+
+struct Input_Event event __attribute__((aligned(4)));
 
 void checkTouchEvents() {
    
    // check if there are no events to check
-   if (touchHandlersLength == 0 && actBarHandlersLength == 0) {
+   if (touchHandlersLength == 0 && actBarHandlersLength == 0 && keyListenersLength == 0) {
       return;
    }
 
@@ -48,20 +57,27 @@ void checkTouchEvents() {
    // if at 00 00 04 B0 then just got input (10 mins internally)
    if (powerOffTime == 0x004B0000) return;
 
-   memset(&event, 0, sizeof(event));
+   Mem_Memset(&event, 0, sizeof(event));
    GetInput(&event, 0xFFFFFFFF, 0x10); // polls
 
    switch (event.type) {
       case EVENT_KEY:
-         // for some reason, this is really slow with certain keys, so kept old event handler
+         if (keyListenersLength > 0 && event.data.key.direction == KEY_PRESSED) {
+             for (uint32_t i = 0; i < keyListenersLength; i++) {
+                 if (event.data.key.keyCode == keyListeners[i].key) {
+                     (*keyListeners[i].callback)();
+                     break;
+                 }
+             }
+         }
          break;
          
       case EVENT_TOUCH:
          // check if there are any touch handlers
          if (touchHandlersLength > 0) {
-            for (uint8_t i = 0; i < touchHandlersLength; i++) {
-               if (event.data.touch_single.p1_x >= touchHandlers[i].minX && event.data.touch_single.p1_x <= touchHandlers[i].maxX &&
-                  event.data.touch_single.p1_y >= touchHandlers[i].minY && event.data.touch_single.p1_y <= touchHandlers[i].maxY) {
+            for (uint32_t i = 0; i < touchHandlersLength; i++) {
+               if ((uint32_t)event.data.touch_single.p1_x >= touchHandlers[i].minX && (uint32_t)event.data.touch_single.p1_x <= touchHandlers[i].maxX &&
+                  (uint32_t)event.data.touch_single.p1_y >= touchHandlers[i].minY && (uint32_t)event.data.touch_single.p1_y <= touchHandlers[i].maxY) {
                   // check direction
                   if (event.data.touch_single.direction == touchHandlers[i].direction) {
                      (*touchHandlers[i].callback)();
@@ -79,7 +95,7 @@ void checkTouchEvents() {
       case EVENT_ACTBAR_SETTINGS:
          // check if there are any act bar handlers
          if (actBarHandlersLength > 0) {
-            for (uint8_t i = 0; i < actBarHandlersLength; i++) {
+            for (uint32_t i = 0; i < actBarHandlersLength; i++) {
                if (event.type == actBarHandlers[i].type) {
                   (*actBarHandlers[i].callback)();
                   break;
@@ -110,8 +126,15 @@ void addActBarListener(uint16_t type, void (*callback)()) {
    actBarHandlers[actBarHandlersLength++] = handler;
 }
 
+void addKeyListener(Input_Keycode key, void (*callback)()) {
+    KeyListener handler;
+    handler.key = key;
+    handler.callback = callback;
+    keyListeners[keyListenersLength++] = handler;
+}
+
 void removeTouchListener(uint32_t minX, uint32_t minY, uint32_t maxX, uint32_t maxY, uint32_t direction = TOUCH_DOWN) {
-   for (uint8_t i = 0; i < touchHandlersLength; i++) {
+   for (uint32_t i = 0; i < touchHandlersLength; i++) {
       if (touchHandlers[i].minX == minX && touchHandlers[i].minY == minY && touchHandlers[i].maxX == maxX && touchHandlers[i].maxY == maxY && touchHandlers[i].direction == direction) {
          touchHandlers[i] = touchHandlers[touchHandlersLength - 1];
          touchHandlersLength--;
@@ -119,8 +142,8 @@ void removeTouchListener(uint32_t minX, uint32_t minY, uint32_t maxX, uint32_t m
    }
 }
 
-void removeActBarListener(uint16_t type) {
-   for (uint8_t i = 0; i < actBarHandlersLength; i++) {
+void removeActBarListener(uint32_t type) {
+   for (uint32_t i = 0; i < actBarHandlersLength; i++) {
       if (actBarHandlers[i].type == type) {
          actBarHandlers[i] = actBarHandlers[actBarHandlersLength - 1];
          actBarHandlersLength--;

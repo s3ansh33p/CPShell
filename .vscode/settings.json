@@ -1,0 +1,6 @@
+{
+    "clangd.arguments": [
+        "--query-driver=/toolchain/bin/sh4a_nofpueb-elf-*"
+    ],
+    "clangd.path": "clangd-19"
+}

@@ -11,7 +11,7 @@
 #include "internal.hpp"
 #include "utilities.hpp"
 #include "../lib/functions/convert.hpp"
-#include <sdk/os/file.hpp>
+#include <sdk/os/file.h>
 
 // Terminal - Defaults here
 uint32_t TERM_COLOR = 0xFFFF;
@@ -28,37 +28,37 @@ int load_userprofile() {
     terminal->ClearBuffer();
 
     int findHandle;
-    wchar_t fileName[100];
-    struct findInfo findInfoBuf;
-    int ret = findFirst(g_wuserprofile, &findHandle, fileName, &findInfoBuf);
+    char_const16_t fileName[100];
+    struct File_FindInfo findInfoBuf;
+    int ret = File_FindFirst((const char_const16_t*)g_wuserprofile, &findHandle, fileName, &findInfoBuf);
     if (ret < 0) {
         // Does not exist so skip
         strcpy(outBuf, "LOAD: Skipping user profile load.\n");
         terminal->WriteChars(outBuf);
-        findClose(findHandle);
+        File_FindClose(findHandle);
         load_settings();
         return 0;
-    } else if (findInfoBuf.type == findInfoBuf.EntryTypeDirectory) {
+    } else if (findInfoBuf.type == File_FindInfo::EntryTypeDirectory) {
         strcpy(outBuf, "LOAD: User profile is a directory.\n");
         terminal->WriteChars(outBuf);
-        findClose(findHandle);
+        File_FindClose(findHandle);
         return -2;
     }
 
-    findClose(findHandle);
+    File_FindClose(findHandle);
 
-    int fd = open(g_userprofile, OPEN_READ);
+    int fd = File_Open(g_userprofile, FILE_OPEN_READ);
     if (fd < 0) {
-        close(fd);
+        File_Close(fd);
         strcpy(outBuf, "LOAD: File error.\n");
         terminal->WriteChars(outBuf);
         return -1;
     }    
 
 	uint8_t* addr;
-	getAddr(fd,0,(const void**)&addr);
+	if (File_GetAddr(fd,0,(const void**)&addr) < 0) {}
 
-    ret = close(fd);
+    ret = File_Close(fd);
     if (ret < 0) {
         strcpy(outBuf, "LOAD: File error.\n");
         terminal->WriteChars(outBuf);

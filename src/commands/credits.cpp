@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 /**
  * @file credits.cpp
  * @author Sean McGinty (newfolderlocation@gmail.com)
@@ -6,7 +8,7 @@
  * @date 2022-06-10
  */
 
-extern int credits_main(int argc, char **argv)
+extern int credits_main(int, char **)
 {
     terminal->ClearBuffer();
     char msg[] = "Written by Sean McGinty (s3ansh33p)\nCredits to:\n- diddyholz for command initialization\n- Interchan for drawing functions\n- SnailMath for file handling\n- Pho3      for general assistance\n";

@@ -1,3 +1,6 @@
+#include <string.h>
+#include <string.h>
+#include <stdlib.h>
 #pragma once
 
 #include "../lib/functions/convert.hpp"
@@ -100,11 +103,6 @@ int cpshell_main(int argc, char **argv)
         char cmds[APPLET_SIZE];
         while (a->name[0] != 0) {
             strcpy(cmds, (a++)->name);
-            // check if terminal->bufferCX is at the end of the line + 2 for ', '
-            if ((terminal->bufferCX + strlen(a->name) + 2) >= terminal->xmax) {
-                terminal->WriteBuffer('\n', false);
-                terminal->ClearBuffer();
-            }
             strcat(cmds, ", ");
             terminal->WriteChars(cmds, true);
         }
@@ -149,18 +147,18 @@ void cpshell_init() {
     strcpy(applets[12].name, "username");
     applets[12].main = username_main;
 
-    memset(&applets[13], 0, sizeof(Applet));
+    Mem_Memset(&applets[13], 0, sizeof(Applet));
 
     // init file system
     // Reference: SnailMath/filemgr
 
     //initialize g_path to home ("\\fls0\\")
-	memset(g_path,0,sizeof(g_path));
+	Mem_Memset(g_path,0,sizeof(g_path));
 	strcpy (g_path, g_home);
 
     //convert from char to wchar
     for(int i=0; g_path[i]!=0; i++){
-        wchar_t ch = g_path[i];
+        char_const16_t ch = g_path[i];
         g_wpath[i] = ch;
     }
     
